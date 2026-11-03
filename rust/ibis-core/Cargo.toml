@@ -11,7 +11,7 @@ rusqlite = { version = "0.31", features = ["bundled-sqlcipher"] }
 sha2 = "0.10"
 hex = "0.4"
 data-encoding = "2"
-rand = "0.8"
+rand = "0.10"
 
 [features]
 # Windows向け：OpenSSLをソースからビルドして同梱する（Perl と NASM が必要になる場合がある）
