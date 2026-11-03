@@ -1,0 +1,768 @@
+{
+ "settings": {
+  "company": {
+   "name": "株式会社サンプル工業",
+   "rep": "山田 太郎",
+   "zip": "123-4567",
+   "addr": "東京都サンプル区サンプル町1-2-3",
+   "tel": "03-1234-5678",
+   "fax": "03-1234-5679",
+   "reg": "T1234567890123"
+  },
+  "taxRates": [
+   {
+    "id": "mw03vvt5m2nvp",
+    "rate": 8,
+    "effectiveFrom": "2014-04-01",
+    "label": "旧税率8%"
+   },
+   {
+    "id": "mw03vvt5myozd",
+    "rate": 10,
+    "effectiveFrom": "2019-10-01",
+    "label": "標準税率10%"
+   },
+   {
+    "id": "t8",
+    "label": "軽減税率8%",
+    "rate": 8,
+    "effectiveFrom": "2014-04-01"
+   }
+  ],
+  "clients": [
+   {
+    "id": "mw03vvt5www8y",
+    "name": "Ｂ建設株式会社",
+    "closingDay": 31,
+    "paymentOffsetMonths": 1,
+    "paymentDay": 31,
+    "creditLimit": 1000000,
+    "zip": "123-4567",
+    "addr1": "東京都サンプル区サンプル町1-2-3",
+    "addr2": "サンプルビル5F",
+    "contactName": "佐藤　一郎",
+    "honorific": "御中",
+    "tel": "03-1234-5678",
+    "fax": "03-1234-5679",
+    "email": "sato@example.com",
+    "registrationNo": "T1234567890123"
+   },
+   {
+    "id": "mw03vvt54mqi0",
+    "name": "Ｃ工業株式会社",
+    "closingDay": 20,
+    "paymentOffsetMonths": 2,
+    "paymentDay": 10,
+    "creditLimit": 500000,
+    "zip": "987-6543",
+    "addr1": "大阪府テスト市テスト町4-5-6",
+    "addr2": "テストビル3F",
+    "contactName": "鈴木　花子",
+    "honorific": "御中",
+    "tel": "06-9876-5432",
+    "fax": "06-9876-5433",
+    "email": "suzuki@example.com",
+    "registrationNo": "T9876543210987"
+   }
+  ],
+  "sites": [
+   "現場A",
+   "現場A加工",
+   "現場B",
+   "現場C",
+   "現場D",
+   "置場",
+   "型枠工事（基礎）",
+   "型枠工事（各階立上り）",
+   "型枠工事（地上階）",
+   "型枠工事（地下階）",
+   "型枠工事（壁底浮かし）",
+   "型枠工事（デッキ工事）",
+   "型枠工事（雑工事）",
+   "型枠工事（断熱材取付）"
+  ],
+  "expenseItems": [
+   "法定福利費",
+   "駐車料金",
+   "高速代",
+   "熱中症対策費"
+  ],
+  "invoiceSeq": 0,
+  "siteBudgets": {
+   "現場A": 120,
+   "現場B": 40
+  },
+  "lastBackupAt": "",
+  "backupIntervalDays": 0,
+  "labelLayout": {
+   "format": "21",
+   "custom": {
+    "cols": 2,
+    "rows": 5,
+    "w": 90,
+    "h": 50,
+    "mt": 10,
+    "ml": 10
+   },
+   "offsetX": 0,
+   "offsetY": 0
+  },
+  "simplifiedTax": {
+   "enabled": false,
+   "category": 3,
+   "rate": 70
+  },
+  "businessType": "法人",
+  "regulation": {
+   "effective": "",
+   "manager": "",
+   "managerTitle": "",
+   "location": ""
+  },
+  "backup": {
+   "auto": true,
+   "retentionYears": 7,
+   "dailyKeepDays": 31,
+   "minIntervalHours": 20,
+   "lastAutoAt": "2026-11-02T10:00:00.000Z",
+   "lastFileAt": ""
+  },
+  "transitionalRates": [
+   {
+    "from": "2019-10-01",
+    "rate": 100
+   },
+   {
+    "from": "2023-10-01",
+    "rate": 80
+   },
+   {
+    "from": "2026-10-01",
+    "rate": 70
+   },
+   {
+    "from": "2028-10-01",
+    "rate": 50
+   },
+   {
+    "from": "2030-10-01",
+    "rate": 30
+   },
+   {
+    "from": "2031-10-01",
+    "rate": 0
+   }
+  ],
+  "transitionalLimit": 100000000,
+  "invoiceTemplates": {
+   "mw03vvt5www8y": {
+    "items": [
+     {
+      "site": "現場A",
+      "content": "型枠工事",
+      "qty": "10",
+      "unit": "m2x",
+      "price": "2100"
+     }
+    ],
+    "expenses": [
+     {
+      "name": "法定福利費",
+      "amount": "380000"
+     }
+    ]
+   }
+  },
+  "savedInvoiceFilters": [
+   {
+    "name": "未収のみ",
+    "search": "",
+    "status": "未収",
+    "closed": "",
+    "sort": "date-desc"
+   }
+  ],
+  "invoiceSeqByMonth": {
+   "2026-10": 1,
+   "2026-11": 4
+  }
+ },
+ "schemaVersion": 2,
+ "migrationHistory": [],
+ "manHours": {
+  "2026-10": {
+   "carry": 0,
+   "rows": [
+    {
+     "content": "現場A",
+     "daily": {
+      "1": 5,
+      "2": 4,
+      "3": 5,
+      "4": 0,
+      "5": 5,
+      "6": 5,
+      "7": 4,
+      "8": 4,
+      "9": 5,
+      "10": 5,
+      "11": 0,
+      "12": 5,
+      "13": 5,
+      "14": 3,
+      "15": 4,
+      "16": 5
+     },
+     "sub": 0
+    },
+    {
+     "content": "現場A加工",
+     "daily": {
+      "1": 5,
+      "2": 4,
+      "3": 5,
+      "4": 0,
+      "5": 0,
+      "6": 5,
+      "7": 5,
+      "8": 5,
+      "9": 0,
+      "10": 0
+     },
+     "sub": 0
+    },
+    {
+     "content": "現場B",
+     "daily": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 0,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1,
+      "11": 1,
+      "12": 0,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1
+     },
+     "sub": 0
+    },
+    {
+     "content": "残業",
+     "daily": {
+      "4": "2H",
+      "6": "2H",
+      "17": "3H",
+      "18": "3H"
+     },
+     "sub": 0
+    }
+   ],
+   "expenses": [
+    {
+     "name": "駐車料金",
+     "amount": "43200"
+    },
+    {
+     "name": "高速代",
+     "amount": "13280"
+    }
+   ],
+   "otCarry": 0
+  },
+  "2026-11": {
+   "carry": 107,
+   "rows": [
+    {
+     "content": "現場A",
+     "daily": {
+      "1": 3,
+      "2": 0,
+      "3": 4,
+      "4": 4,
+      "5": 5,
+      "6": 4,
+      "7": 5,
+      "8": 5,
+      "9": 0,
+      "10": 5,
+      "11": 4,
+      "12": 5,
+      "13": 5,
+      "14": 5,
+      "15": 5,
+      "16": 0,
+      "17": 5
+     },
+     "sub": 64
+    },
+    {
+     "content": "現場C",
+     "daily": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0,
+      "17": 0,
+      "18": 0,
+      "19": 0,
+      "20": 0,
+      "21": 0,
+      "22": 0,
+      "23": 3,
+      "24": 5,
+      "25": 5,
+      "26": 0,
+      "27": 5,
+      "28": 4,
+      "29": 3,
+      "30": 4
+     },
+     "sub": 29
+    },
+    {
+     "content": "置場",
+     "daily": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "6": 0,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1,
+      "11": 0,
+      "12": 1,
+      "13": 1,
+      "14": 0,
+      "15": 0,
+      "16": 0,
+      "17": 1,
+      "18": 1,
+      "19": 1,
+      "20": 0,
+      "21": 1,
+      "22": 1,
+      "23": 1,
+      "24": 1,
+      "25": 1,
+      "26": 1,
+      "27": 0,
+      "28": 1,
+      "29": 1,
+      "30": 1
+     },
+     "sub": 23
+    },
+    {
+     "content": "残業",
+     "daily": {
+      "3": "1H",
+      "7": "1H",
+      "14": "1H",
+      "28": "1H"
+     },
+     "sub": 4
+    },
+    {
+     "content": "応援（臨時）",
+     "daily": {
+      "1": "3",
+      "2": "２H",
+      "3": "1.5H"
+     },
+     "sub": 0,
+     "kind": "overtime"
+    },
+    {
+     "content": "雑工",
+     "daily": {
+      "1": "メモ",
+      "2": "２",
+      "3": 1.5
+     },
+     "sub": 0
+    }
+   ],
+   "expenses": [
+    {
+     "name": "駐車料金",
+     "amount": "54100"
+    },
+    {
+     "name": "高速代",
+     "amount": "18260"
+    },
+    {
+     "name": "駐車料金",
+     "amount": "3273"
+    }
+   ],
+   "otCarry": 10
+  }
+ },
+ "invoices": {
+  "2026-10": [
+   {
+    "id": "mw03vvt5h5ijz",
+    "clientId": "mw03vvt5www8y",
+    "date": "2026-10-20",
+    "no": "KD202610-001",
+    "taxRateId": "mw03vvt5myozd",
+    "status": "回収済み",
+    "issued": "2026-11-03T03:06:11.273Z",
+    "items": [
+     {
+      "site": "現場A",
+      "content": "型枠工事（各階立上り）",
+      "qty": "1130",
+      "unit": "m2x",
+      "price": "2000"
+     },
+     {
+      "site": "現場B",
+      "content": "型枠工事",
+      "qty": "60",
+      "unit": "m2x",
+      "price": "2000"
+     },
+     {
+      "site": "現場C",
+      "content": "型枠工事",
+      "qty": "220",
+      "unit": "m2x",
+      "price": "2000"
+     },
+     {
+      "site": "現場D",
+      "content": "型枠工事（基礎）",
+      "qty": "170",
+      "unit": "m2x",
+      "price": "2000"
+     }
+    ],
+    "expenses": [
+     {
+      "name": "法定福利費",
+      "amount": "404999"
+     },
+     {
+      "name": "駐車料金",
+      "amount": "3273"
+     }
+    ],
+    "payments": [
+     {
+      "date": "2026-10-25",
+      "amount": "3925099"
+     },
+     {
+      "date": "2026-10-25",
+      "amount": "1000000"
+     },
+     {
+      "date": "2026-10-31",
+      "amount": "2925099"
+     }
+    ],
+    "issueHash": "db5ebab9df02529350503dff862064a929fa4d70c9a73ef03afdb85997e99947"
+   }
+  ],
+  "2026-11": [
+   {
+    "id": "mw03vvt88tgii",
+    "clientId": "mw03vvt5www8y",
+    "date": "2026-11-20",
+    "no": "KD202611-001",
+    "taxRateId": "mw03vvt5myozd",
+    "status": "一部回収",
+    "issued": "2026-11-03T03:06:11.276Z",
+    "items": [
+     {
+      "site": "現場A",
+      "content": "型枠工事（基礎）",
+      "qty": "95",
+      "unit": "m2x",
+      "price": "2100",
+      "amount": 199500
+     },
+     {
+      "site": "現場B",
+      "content": "型枠工事（各階立上り）",
+      "qty": "60",
+      "unit": "m2x",
+      "price": "2000",
+      "amount": 120000
+     }
+    ],
+    "expenses": [
+     {
+      "name": "法定福利費",
+      "amount": "380000"
+     },
+     {
+      "name": "高速代",
+      "amount": "5200"
+     }
+    ],
+    "payments": [
+     {
+      "date": "2026-11-28",
+      "amount": "300000"
+     }
+    ],
+    "issueHash": "119bb8677ded3abf5c097aeaa11c8878e93ec333322baef2cc5086e0b38c958c"
+   },
+   {
+    "id": "mw03vwdcgwpwc",
+    "clientId": "mw03vvt5www8y",
+    "date": "2026-11-05",
+    "no": "KD202611-002",
+    "taxRateId": "t8",
+    "status": "取消",
+    "items": [
+     {
+      "site": "現場A",
+      "content": "型枠工事（基礎）",
+      "qty": "1.5",
+      "unit": "m2x",
+      "price": "2100",
+      "amount": 3150
+     },
+     {
+      "site": "現場B",
+      "content": "値引き",
+      "qty": "1",
+      "unit": "式",
+      "price": "-300",
+      "amount": -300
+     },
+     {
+      "site": "現場C",
+      "content": "全角数量",
+      "qty": "１２",
+      "unit": "人",
+      "price": "15000",
+      "amount": 0
+     }
+    ],
+    "expenses": [
+     {
+      "name": "高速代",
+      "amount": "5200"
+     }
+    ],
+    "payments": [],
+    "issueHash": "1dae84819a3326c390e30d4b567127bf508a52671ccfe4037b9de67e1412637f",
+    "issued": "2026-11-03T03:06:12.139Z",
+    "voided": {
+     "at": "2026-11-03T03:06:12.141Z",
+     "reason": "テスト理由",
+     "creditNo": "KD202611-003"
+    }
+   },
+   {
+    "id": "mw03vwh8l6z02",
+    "clientId": "mw03vvt5www8y",
+    "date": "2026-11-03",
+    "no": "KD202611-003",
+    "taxRateId": "t8",
+    "status": "取消",
+    "items": [
+     {
+      "site": "現場A",
+      "content": "型枠工事（基礎）",
+      "qty": "1.5",
+      "unit": "m2x",
+      "price": "-2100"
+     },
+     {
+      "site": "現場B",
+      "content": "値引き",
+      "qty": "1",
+      "unit": "式",
+      "price": "300"
+     },
+     {
+      "site": "現場C",
+      "content": "全角数量",
+      "qty": "１２",
+      "unit": "人",
+      "price": "-15000"
+     }
+    ],
+    "expenses": [
+     {
+      "name": "高速代",
+      "amount": "-5200"
+     }
+    ],
+    "payments": [],
+    "creditOf": "mw03vwdcgwpwc",
+    "creditOfNo": "KD202611-002",
+    "creditOfDate": "2026-11-05",
+    "reason": "テスト理由",
+    "issued": "2026-11-03T03:06:12.140Z",
+    "issueHash": "75477b488bb97306eb089a76085b59e6fddb8a14141799a43685aa6410900351"
+   },
+   {
+    "id": "mw03vwjfb3dxp",
+    "clientId": "mw03vvt54mqi0",
+    "date": "2026-11-18",
+    "no": "KD202611-004",
+    "taxRateId": "mw03vvt5myozd",
+    "status": "未収",
+    "items": [
+     {
+      "site": "現場D",
+      "content": "下書き",
+      "qty": "3",
+      "unit": "m2x",
+      "price": "1000"
+     }
+    ],
+    "expenses": [],
+    "payments": []
+   }
+  ]
+ },
+ "labels": [
+  {
+   "id": "mw03vvt8mvlag",
+   "zip": "123-4567",
+   "addr1": "東京都サンプル区サンプル町1-2-3",
+   "addr2": "",
+   "name": "Ｂ建設株式会社",
+   "honorific": "御中"
+  },
+  {
+   "id": "mw03vvt8n52ws",
+   "zip": "987-6543",
+   "addr1": "大阪府テスト市テスト町4-5-6",
+   "addr2": "テストビル3F",
+   "name": "Ｃ工業株式会社",
+   "honorific": "御中"
+  },
+  {
+   "id": "mw03vvt82l7hn",
+   "zip": "111-2222",
+   "addr1": "神奈川県サンプル市サンプル町7-8-9",
+   "addr2": "",
+   "name": "鈴木 一郎",
+   "honorific": "様"
+  }
+ ],
+ "siteCosts": {
+  "現場A": [
+   {
+    "id": "sc1",
+    "date": "2026-10-15",
+    "category": "外注費",
+    "amount": "150000",
+    "memo": "テスト"
+   },
+   {
+    "id": "sc2",
+    "date": "2026-10-20",
+    "category": "材料費",
+    "amount": "48000",
+    "memo": ""
+   }
+  ],
+  "現場B": [
+   {
+    "id": "sc3",
+    "date": "2026-11-02",
+    "category": "その他経費",
+    "amount": "12000",
+    "memo": "高速"
+   }
+  ]
+ },
+ "closed": {
+  "manHours": {
+   "2026-10": true
+  },
+  "invoices": {
+   "2026-10": true
+  }
+ },
+ "auditLog": [
+  {
+   "seq": 1,
+   "time": "2026-11-03T03:06:11.277Z",
+   "action": "サンプルデータを登録（既存データを上書き）",
+   "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+   "hash": "2b90d5bd7f526cf2f2e4481988b99959a66a007f2cc9316f5ace11e8fe08fd72"
+  },
+  {
+   "seq": 2,
+   "time": "2026-11-03T03:06:11.286Z",
+   "action": "請求書 No.KD202610-001 を発行（確定）／取引先：Ｂ建設株式会社／発行日：2026-10-20／総合計：￥3,925,099／内容ハッシュ：db5ebab9df02529350503dff862064a929fa4d70c9a73ef03afdb85997e99947",
+   "prev": "2b90d5bd7f526cf2f2e4481988b99959a66a007f2cc9316f5ace11e8fe08fd72",
+   "hash": "6c17ce255eb254abe7f5506fac018e93ee1747dab4181add14b9957947f5bb6a"
+  },
+  {
+   "seq": 3,
+   "time": "2026-11-03T03:06:11.286Z",
+   "action": "請求書 No.KD202611-001 を発行（確定）／取引先：Ｂ建設株式会社／発行日：2026-11-20／総合計：￥775,170／内容ハッシュ：119bb8677ded3abf5c097aeaa11c8878e93ec333322baef2cc5086e0b38c958c",
+   "prev": "6c17ce255eb254abe7f5506fac018e93ee1747dab4181add14b9957947f5bb6a",
+   "hash": "75006c73e47670a845bc7bcbd26f210a9c1dd78c26f2fdb9c99aead2043d1273"
+  },
+  {
+   "seq": 4,
+   "time": "2026-11-03T03:06:12.000Z",
+   "action": "請求書を新規作成（2026年11月 No.KD202611-002）",
+   "prev": "75006c73e47670a845bc7bcbd26f210a9c1dd78c26f2fdb9c99aead2043d1273",
+   "hash": "2b37c0bfeadc7d3ab6019e7b847da7f59e66ef190f3c6501f951d89521dd23bf"
+  },
+  {
+   "seq": 5,
+   "time": "2026-11-03T03:06:12.139Z",
+   "action": "請求書 No.KD202611-002 を発行（確定）／取引先：Ｂ建設株式会社／発行日：2026-11-05／総合計：￥8,694／内容ハッシュ：1dae84819a3326c390e30d4b567127bf508a52671ccfe4037b9de67e1412637f",
+   "prev": "2b37c0bfeadc7d3ab6019e7b847da7f59e66ef190f3c6501f951d89521dd23bf",
+   "hash": "2fddad64db96669fec50fd78ba3f686ed055e87a3b20cf7d18546f2691246ad3"
+  },
+  {
+   "seq": 6,
+   "time": "2026-11-03T03:06:12.141Z",
+   "action": "請求書 No.KD202611-002 を取消（理由：テスト理由）／赤伝 No.KD202611-003 を作成（金額：￥-8,694）／内容ハッシュ：75477b488bb97306eb089a76085b59e6fddb8a14141799a43685aa6410900351",
+   "prev": "2fddad64db96669fec50fd78ba3f686ed055e87a3b20cf7d18546f2691246ad3",
+   "hash": "f7916c4473064e78bdfc15a2194f07d763caeab2896663fdf9bda9e735995293"
+  },
+  {
+   "seq": 7,
+   "time": "2026-11-03T03:06:12.219Z",
+   "action": "請求書を新規作成（2026年11月 No.KD202611-004）",
+   "prev": "f7916c4473064e78bdfc15a2194f07d763caeab2896663fdf9bda9e735995293",
+   "hash": "93e2b193e64a4171f88efec6e6357a49151b817bfdeea3e8b368580e62dcdeef"
+  },
+  {
+   "seq": 8,
+   "time": "2026-11-03T03:06:12.284Z",
+   "action": "テスト用の操作",
+   "prev": "93e2b193e64a4171f88efec6e6357a49151b817bfdeea3e8b368580e62dcdeef",
+   "hash": "f4bfffa88a5b171e922eb7fd0bcc3b05fa703bae8e403eb05b4d10c0b2027f8b"
+  }
+ ]
+}

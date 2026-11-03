@@ -1,0 +1,2 @@
+# DBの暗号化（SQLCipher）のテストに必要。無くても暗号化なしのテストは実行できる
+sqlcipher3-wheels>=0.5.7

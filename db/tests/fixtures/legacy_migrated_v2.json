@@ -1,0 +1,201 @@
+{
+ "settings": {
+  "company": {
+   "name": "旧社"
+  },
+  "taxRates": [
+   {
+    "id": "t1",
+    "rate": 10,
+    "effectiveFrom": "2019-10-01",
+    "label": "標準"
+   }
+  ],
+  "clients": [
+   {
+    "id": "c1",
+    "name": "旧取引先"
+   }
+  ],
+  "sites": [
+   "現場A"
+  ],
+  "expenseItems": [
+   "高速代"
+  ],
+  "invoiceSeq": 0,
+  "siteBudgets": {},
+  "lastBackupAt": "",
+  "backupIntervalDays": 0,
+  "labelLayout": {
+   "format": "21",
+   "custom": {
+    "cols": 2,
+    "rows": 5,
+    "w": 90,
+    "h": 50,
+    "mt": 10,
+    "ml": 10
+   },
+   "offsetX": 0,
+   "offsetY": 0
+  },
+  "simplifiedTax": {
+   "enabled": false,
+   "category": 3,
+   "rate": 70
+  },
+  "businessType": "法人",
+  "regulation": {
+   "effective": "",
+   "manager": "",
+   "managerTitle": "",
+   "location": ""
+  },
+  "backup": {
+   "auto": true,
+   "retentionYears": 7,
+   "dailyKeepDays": 31,
+   "minIntervalHours": 20,
+   "lastAutoAt": "",
+   "lastFileAt": ""
+  },
+  "transitionalRates": [
+   {
+    "from": "2019-10-01",
+    "rate": 100
+   },
+   {
+    "from": "2023-10-01",
+    "rate": 80
+   },
+   {
+    "from": "2026-10-01",
+    "rate": 70
+   },
+   {
+    "from": "2028-10-01",
+    "rate": 50
+   },
+   {
+    "from": "2030-10-01",
+    "rate": 30
+   },
+   {
+    "from": "2031-10-01",
+    "rate": 0
+   }
+  ],
+  "transitionalLimit": 100000000,
+  "invoiceTemplates": {},
+  "savedInvoiceFilters": []
+ },
+ "manHours": {
+  "2026-09": {
+   "rows": [
+    {
+     "content": "現場A",
+     "daily": {
+      "1": 5,
+      "2": 5
+     }
+    },
+    {
+     "content": "残業",
+     "daily": {
+      "1": "2H",
+      "2": "1.5H"
+     },
+     "kind": "overtime"
+    }
+   ],
+   "carry": 0,
+   "expenses": [],
+   "otCarry": 0
+  },
+  "2026-10": {
+   "rows": [
+    {
+     "content": "現場A",
+     "daily": {
+      "1": 3
+     }
+    },
+    {
+     "content": "残業",
+     "daily": {
+      "1": "1H"
+     },
+     "kind": "overtime"
+    }
+   ],
+   "carry": 12,
+   "expenses": [],
+   "otCarry": 3.5
+  }
+ },
+ "invoices": {
+  "2026-10": [
+   {
+    "id": "i1",
+    "clientId": "c1",
+    "date": "2026-10-20",
+    "no": "KD202610-001",
+    "taxRateId": "t1",
+    "status": "未収",
+    "items": [
+     {
+      "site": "現場A",
+      "content": "x",
+      "qty": "1",
+      "unit": "m2x",
+      "price": "1000"
+     }
+    ],
+    "expenses": [],
+    "payments": []
+   }
+  ]
+ },
+ "labels": [],
+ "auditLog": [
+  {
+   "seq": 1,
+   "time": "2026/10/1 09:00:00",
+   "action": "古い",
+   "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+   "hash": "f645ab44ad6f27b2e1a22ce89c3a87c8c6b8a1dc2208ba3cc95e1effc7600bc4"
+  },
+  {
+   "seq": 2,
+   "time": "2026/10/2 10:00:00",
+   "action": "新しい",
+   "prev": "f645ab44ad6f27b2e1a22ce89c3a87c8c6b8a1dc2208ba3cc95e1effc7600bc4",
+   "hash": "77758fd026589b03b034c5e32c5b271e3b4146954fefaca6a25911886f957898"
+  },
+  {
+   "seq": 3,
+   "time": "2026-11-03T03:06:12.288Z",
+   "action": "旧形式の操作ログを追記専用（ハッシュ連鎖）形式へ移行",
+   "prev": "77758fd026589b03b034c5e32c5b271e3b4146954fefaca6a25911886f957898",
+   "hash": "bd059e01e56f3888dc3285fa31c7abb6c4099e5bc4ae062efacdc834d93e9c8f"
+  }
+ ],
+ "siteCosts": {},
+ "closed": {
+  "manHours": {},
+  "invoices": {}
+ },
+ "migrationHistory": [
+  {
+   "at": "2026-11-03T03:06:12.288Z",
+   "from": 1,
+   "to": 2,
+   "steps": [
+    "v1→v2：残業行の種別・残業累計の追加／操作ログの追記専用化／請求書の発行状態の初期化"
+   ],
+   "warnings": 1
+  }
+ ],
+ "schemaVersion": 2
+}
