@@ -48,6 +48,7 @@ def make(name, key=None):
 
 
 @unittest.skipIf(sc is None, "sqlcipher3 が必要です")
+@unittest.skipIf(M._win_sqlcipher_blocked(), "Windowsでは、Pythonの暗号化DBは使わない（Rust側で確認済み）")
 class TestEncryptedDb(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -173,6 +174,29 @@ class TestEncryptedDb(unittest.TestCase):
         self.assertTrue(detected, "破損（改ざん）を検出できなかった")
 
 
+class TestWindowsGuard(unittest.TestCase):
+    """Windowsでは、暗号化DBを開こうとするとクラッシュせず、分かりやすいエラーで止まる（Linuxでは、判定を差し替えて確認する）"""
+
+    def test_windows_guard_message(self):
+        orig = M._win_sqlcipher_blocked
+        M._win_sqlcipher_blocked = lambda: True
+        try:
+            with self.assertRaises(M.MigrationError) as cm:
+                M.open_db(os.path.join(TMP, "never.db"), M.generate_key_hex())
+            self.assertIn("Windowsでは", str(cm.exception))
+            self.assertFalse(os.path.exists(os.path.join(TMP, "never.db")), "DBファイルを作らない")
+            c = M.open_db(os.path.join(TMP, "plain_ok.db"))           # 暗号化なしは、そのまま使える
+            c.close()
+        finally:
+            M._win_sqlcipher_blocked = orig
+
+    def test_policy(self):
+        self.assertTrue(M._win_sqlcipher_policy("nt", {}))                                   # Windowsでは使わない
+        self.assertFalse(M._win_sqlcipher_policy("nt", {"IBIS_ALLOW_WIN_SQLCIPHER": "1"}))    # 検証のための解除
+        self.assertTrue(M._win_sqlcipher_policy("nt", {"IBIS_ALLOW_WIN_SQLCIPHER": "yes"}))   # 「1」以外では解除しない
+        self.assertFalse(M._win_sqlcipher_policy("posix", {}))                               # Linux・macOSでは使う
+
+
 @unittest.skipIf(sc is None, "sqlcipher3 が必要です")
 class TestRecoveryCode(unittest.TestCase):
     def test_roundtrip_and_format(self):
@@ -208,35 +232,64 @@ class TestRecoveryCode(unittest.TestCase):
             M.parse_recovery_code(code.replace(code[0], "Z" if code[0] != "Z" else "Y", 1))
 
     def test_detects_typos(self):
-        """1文字の入力ミスは、必ず「エラー」になる。別の鍵として受け付けてしまうことはない。
-        （最後の1文字だけは、鍵に使われないビットを含むため、そこだけの違いは同じ鍵として読める＝実害なし）"""
-        for k in ("0123456789abcdef" * 4, M.generate_key_hex(), "ff" * 32):
+        """1文字の書き間違いは、**必ず**エラーになる（検査文字による保証）。全位置×全文字を、複数の鍵で全数検査する。
+        別の鍵として受け付ける・同じ鍵として受け付ける、のどちらもあってはならない"""
+        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+        keys = ["0123456789abcdef" * 4, "ff" * 32, "00" * 32] + [M.generate_key_hex() for _ in range(20)]
+        trials = 0
+        for k in keys:
             code = M.recovery_code(k)
-            alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
-            positions = [i for i, ch in enumerate(code) if ch != "-"]
-            last = positions[-1]
-            wrong_key = benign_elsewhere = 0
-            for i in positions:
+            self.assertEqual(M.parse_recovery_code(code), k)
+            for i, ch0 in enumerate(code):
+                if ch0 == "-":
+                    continue
                 for ch in alphabet:
-                    if ch == code[i]:
+                    if ch == ch0:
                         continue
-                    try:
-                        got = M.parse_recovery_code(code[:i] + ch + code[i + 1:])
-                    except M.MigrationError:
-                        continue                                   # 検出できた
-                    if got != k:
-                        wrong_key += 1                             # 別の鍵として受け付けた（あってはならない）
-                    elif i != last:
-                        benign_elsewhere += 1
-            self.assertEqual(wrong_key, 0, "入力ミスを別の鍵として受け付けた")
-            self.assertEqual(benign_elsewhere, 0, "最後の文字以外の入力ミスを見逃した")
+                    trials += 1
+                    with self.assertRaises(M.MigrationError, msg=f"見逃し：位置{i} {ch0}→{ch}"):
+                        M.parse_recovery_code(code[:i] + ch + code[i + 1:])
+        self.assertGreater(trials, 30000)
         with self.assertRaises(M.MigrationError):
             M.parse_recovery_code(code[:-3])                       # 短い
         with self.assertRaises(M.MigrationError):
             M.parse_recovery_code("これは復旧コードではありません")
 
+    def test_detects_most_adjacent_transpositions_and_random_errors(self):
+        """隣り合う2文字の入れ替え・複数文字の誤りは、ほぼ確実に検出する（確率的。見逃しは極めてまれ）"""
+        swaps = missed = 0
+        for _ in range(60):
+            k = M.generate_key_hex(); code = M.recovery_code(k).replace("-", "")
+            for i in range(54):
+                if code[i] == code[i + 1]:
+                    continue
+                swaps += 1
+                bad = code[:i] + code[i + 1] + code[i] + code[i + 2:]
+                try:
+                    if M.parse_recovery_code(bad) != k:
+                        missed += 1                                 # 別の鍵として受け付けた
+                except M.MigrationError:
+                    pass
+        self.assertEqual(missed, 0)
+        import random
+        rnd = random.Random(7); accepted = 0
+        for _ in range(20000):                                      # 2〜5文字をでたらめに変える
+            k = M.generate_key_hex(); code = list(M.recovery_code(k).replace("-", ""))
+            orig = "".join(code)
+            for pos in rnd.sample(range(55), rnd.randint(2, 5)):
+                code[pos] = rnd.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567")
+            bad = "".join(code)
+            if bad == orig:                                         # たまたま元と同じ文字になった場合は、誤りではない
+                continue
+            try:
+                M.parse_recovery_code(bad); accepted += 1
+            except M.MigrationError:
+                pass
+        self.assertLessEqual(accepted, 2, f"でたらめな誤りの見逃し {accepted}/20000（理論値は約0.04件）")
+
 
 @unittest.skipIf(sc is None, "sqlcipher3 が必要です")
+@unittest.skipIf(M._win_sqlcipher_blocked(), "Windowsでは、Pythonの暗号化DBは使わない（Rust側で確認済み）")
 class TestCli(unittest.TestCase):
     def test_keygen_migrate_verify_export(self):
         script = os.path.join(ROOT, "migrate_json_to_sqlite.py")
@@ -303,6 +356,7 @@ class TestRecoverySheet(unittest.TestCase):
 
 
 @unittest.skipIf(sc is None, "sqlcipher3 が必要です")
+@unittest.skipIf(M._win_sqlcipher_blocked(), "Windowsでは、Pythonの暗号化DBは使わない（Rust側で確認済み）")
 class TestPerformance(unittest.TestCase):
     def test_overhead(self):
         base = fx("rich_v2.json")

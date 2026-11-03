@@ -121,6 +121,7 @@ powershell -ExecutionPolicy Bypass -File tools\collect-report.ps1
 | 「パスが長すぎる」 | `git config --system core.longpaths true`（管理者）。リポジトリを短いパス（例 `C:\work\ibis`）に置く |
 | ビルドが極端に遅い・ファイルが消える | ウイルス対策ソフトが監視している可能性。リポジトリと `target` フォルダを除外に追加する（会社のポリシーに従う。要確認） |
 | テストが `UnicodeEncodeError: 'charmap' codec can't encode` で落ちる | Pythonの出力の文字コードが、日本語を表せない既定値になっている。`$env:PYTHONUTF8 = "1"` を設定してから実行する（`tools\build-core.ps1` は自動で設定する。GitHubのWindows環境で実際に起きた） |
+| 移行ツールで暗号化DBを扱うと「Windowsでは、このツールで暗号化DBを扱えません」と出る | 仕様です。Windows版のPython用暗号化ライブラリ（`sqlcipher3-wheels`）は、暗号化DBにスキーマを作る処理でクラッシュする（GitHubのWindows環境で確認。作業領域を128MBに広げても再現）。Windowsの暗号化DBは、動作を確認済みのRust側（アプリ）で扱う。暗号化なしの移行・確認、鍵の作成、復旧コードの控え・確認は、Windowsでもこのツールで使える |
 | `pip install` で `sqlcipher3-wheels` が入らない | Windows用の配布が無い可能性。Pythonの暗号化テストは省略し、Rustのテストで確認する |
 
 ## 7. 代替手順：vcpkg の OpenSSL を使う（要検証）

@@ -217,24 +217,63 @@ def normalize_key(key_hex):
     return k
 
 
+# --- 復旧コードの形式（55文字） ---------------------------------------------------------------
+#   鍵（256ビット）＋ ハッシュの先頭14ビット ＝ 270ビット ＝ 54文字（Base32）、さらに末尾に「検査文字」1文字 ＝ 55文字。
+#   検査文字は Luhn mod 32 方式：1文字の書き間違いは、**必ず**検出できる（数学的に保証）。
+#   ハッシュ14ビットは、2文字以上の誤り・取り違えを検出する（見逃しは約1/16,000×1/32＝約52万分の1）。
+_B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+
+
+def _luhn32_generate(vals):
+    factor, total = 2, 0
+    for v in reversed(vals):
+        a = factor * v
+        factor = 1 if factor == 2 else 2
+        total += a // 32 + a % 32
+    return (32 - total % 32) % 32
+
+
+def _luhn32_valid(vals):
+    factor, total = 1, 0
+    for v in reversed(vals):
+        a = factor * v
+        factor = 2 if factor == 1 else 1
+        total += a // 32 + a % 32
+    return total % 32 == 0
+
+
+def _hash14(raw):
+    return int.from_bytes(hashlib.sha256(raw).digest()[:2], "big") >> 2
+
+
 def recovery_code(key_hex):
-    """鍵を紙に控えるための復旧コード（Base32＋誤り検出2バイト）。例：ABCDE-FGHIJ-…（11グループ）"""
+    """鍵を紙に控えるための復旧コード（55文字。5文字ずつ「-」で区切る）"""
     raw = bytes.fromhex(normalize_key(key_hex))
-    s = base64.b32encode(raw + hashlib.sha256(raw).digest()[:2]).decode().rstrip("=")
-    return "-".join(s[i:i + 5] for i in range(0, len(s), 5))
+    n = (int.from_bytes(raw, "big") << 14) | _hash14(raw)           # 270ビット
+    vals = [(n >> (5 * (53 - i))) & 31 for i in range(54)]
+    vals.append(_luhn32_generate(vals))
+    s = "".join(_B32[v] for v in vals)
+    return "-".join(s[i:i + 5] for i in range(0, 55, 5))
 
 
 def _decode_recovery(s):
-    raw = base64.b32decode(s + "=" * (-len(s) % 8))
-    if len(raw) != 34 or hashlib.sha256(raw[:32]).digest()[:2] != raw[32:]:
-        raise ValueError("checksum")
-    return raw[:32].hex()
+    vals = [_B32.find(ch) for ch in s]
+    if len(vals) != 55 or min(vals) < 0 or not _luhn32_valid(vals):
+        raise ValueError("check-char")
+    n = 0
+    for v in vals[:54]:
+        n = (n << 5) | v
+    raw = (n >> 14).to_bytes(32, "big")
+    if (n & 0x3FFF) != _hash14(raw):
+        raise ValueError("hash")
+    return raw.hex()
 
 
 def parse_recovery_code(code):
     """復旧コードから鍵を復元する。大小文字・空白・ハイフンは無視。
     手書きの取り違えに備え、このコードでは使われない数字を文字として読み替える（0→O、8→B、1→I または L）。
-    読み替えが正しいかは、コード末尾の誤り検出で確認する（誤った読み替えが受け付けられることはない）"""
+    読み替えが正しいかは、検査文字とハッシュで確認する。1文字の書き間違いは必ずエラーになる。
+    1が I か L か判別できない（両方とも検査を通る）場合は、推測せずエラーにする"""
     s = "".join(str(code).upper().split()).replace("-", "").replace("0", "O").replace("8", "B")
     if s.count("1") > 4:
         raise MigrationError("復旧コードの形式が正しくありません。")
@@ -253,7 +292,7 @@ def parse_recovery_code(code):
         raise MigrationError("1 が I と L のどちらか判別できません。控えを見て、I または L の文字で入力してください。")
     if len("".join(str(code).split()).replace("-", "")) != 55:
         raise MigrationError("復旧コードの文字数が違います（全55文字）。")
-    raise MigrationError("復旧コードが正しくありません（入力ミスの可能性があります）。")
+    raise MigrationError("復旧コードが正しくありません（入力ミスの可能性があります。控えと見比べてください）。")
 
 
 def _h(s):
@@ -314,9 +353,24 @@ def _row_factory(conn):
     return _sqlcipher.Row if (_sqlcipher is not None and isinstance(conn, _sqlcipher.Connection)) else sqlite3.Row
 
 
+def _win_sqlcipher_blocked():
+    """Windowsでは、Pythonの暗号化（sqlcipher3-wheels）を使わない。
+    GitHubのWindows環境で、暗号化DBにスキーマを作る処理がクラッシュする（作業領域を128MBに広げても再現。ライブラリ側の問題と判断）。
+    暗号化DBは、Windowsで動作を確認済みのRust側（ibis-core）で扱う。検証のために試す場合だけ、環境変数 IBIS_ALLOW_WIN_SQLCIPHER=1 で解除できる"""
+    return _win_sqlcipher_policy(os.name, os.environ)
+
+
+def _win_sqlcipher_policy(os_name, env):
+    """判定の規則（テストで、環境に関係なく確かめられるように分けている）"""
+    return os_name == "nt" and env.get("IBIS_ALLOW_WIN_SQLCIPHER") != "1"
+
+
 def open_db(path, key_hex=None, isolation_level=""):
     """DBを開く。鍵があればSQLCipherで復号する（鍵が違う・暗号化DBに鍵なし・平文DBに鍵ありは、ここで失敗する）"""
     key = normalize_key(key_hex) if key_hex else None
+    if key and _win_sqlcipher_blocked():
+        raise MigrationError("Windowsでは、このツールで暗号化DBを扱えません（Windows版の暗号化ライブラリが不安定なため）。"
+                             "暗号化DBの作成・確認は、アプリ（Rust）で行ってください。暗号化なしの移行・確認は、このまま使えます。")
     drv = _driver(key)
     conn = drv.connect(path, isolation_level=isolation_level)
     try:

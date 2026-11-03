@@ -1,7 +1,6 @@
 //! 統合業務システム C案：データ層（SQLCipher）の最小実装。
 //! 目的は「Rust＋rusqlite＋SQLCipher で、設計済みのスキーマ・トリガー・暗号化・操作ログ・復旧コードが
 //! Pythonの参照実装と互換に動く」ことの確認。画面（Tauri）はこの上に載せる。
-use data_encoding::BASE32_NOPAD;
 use rand::RngCore;
 use rusqlite::{params, Connection};
 use sha2::{Digest, Sha256};
@@ -41,58 +40,107 @@ pub fn normalize_key(key_hex: &str) -> Result<String> {
     }
 }
 
-/// 鍵を紙に控えるための復旧コード（Base32＋誤り検出2バイト）。Python版と同じ形式
+// 復旧コードの形式（55文字）：鍵256ビット＋ハッシュ先頭14ビット＝270ビット＝54文字（Base32）＋ 検査文字1文字（Luhn mod 32）。
+// 検査文字により、1文字の書き間違いは必ず検出できる。ハッシュ14ビットは、複数文字の誤りを検出する。Python版と同じ形式
+const B32: &[u8; 32] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+fn luhn32_generate(vals: &[u32]) -> u32 {
+    let (mut factor, mut total) = (2u32, 0u32);
+    for &v in vals.iter().rev() {
+        let a = factor * v;
+        factor = if factor == 2 { 1 } else { 2 };
+        total += a / 32 + a % 32;
+    }
+    (32 - total % 32) % 32
+}
+
+fn luhn32_valid(vals: &[u32]) -> bool {
+    let (mut factor, mut total) = (1u32, 0u32);
+    for &v in vals.iter().rev() {
+        let a = factor * v;
+        factor = if factor == 1 { 2 } else { 1 };
+        total += a / 32 + a % 32;
+    }
+    total % 32 == 0
+}
+
+fn hash14(raw: &[u8]) -> u32 {
+    let h = Sha256::digest(raw);
+    ((((h[0] as u32) << 8) | h[1] as u32) >> 2) & 0x3FFF
+}
+
+/// 鍵を紙に控えるための復旧コード（55文字。5文字ずつ「-」で区切る）
 pub fn recovery_code(key_hex: &str) -> Result<String> {
     let raw = hex::decode(normalize_key(key_hex)?).unwrap();
-    let chk = Sha256::digest(&raw);
-    let mut buf = raw.clone();
-    buf.extend_from_slice(&chk[..2]);
-    let s = BASE32_NOPAD.encode(&buf);
-    Ok(s.as_bytes().chunks(5).map(|c| std::str::from_utf8(c).unwrap()).collect::<Vec<_>>().join("-"))
+    let mut bits: Vec<u8> = Vec::with_capacity(270);
+    for byte in &raw {
+        for b in (0..8).rev() {
+            bits.push((byte >> b) & 1);
+        }
+    }
+    let h = hash14(&raw);
+    for b in (0..14).rev() {
+        bits.push(((h >> b) & 1) as u8);
+    }
+    let mut vals: Vec<u32> = bits.chunks(5).map(|c| c.iter().fold(0u32, |a, &x| (a << 1) | x as u32)).collect();
+    let chk = luhn32_generate(&vals);
+    vals.push(chk);
+    let s: Vec<u8> = vals.iter().map(|&v| B32[v as usize]).collect();
+    Ok(s.chunks(5).map(|c| std::str::from_utf8(c).unwrap()).collect::<Vec<_>>().join("-"))
+}
+
+fn decode_recovery(s: &str) -> Option<String> {
+    let mut vals: Vec<u32> = Vec::with_capacity(55);
+    for ch in s.bytes() {
+        vals.push(B32.iter().position(|&c| c == ch)? as u32);
+    }
+    if vals.len() != 55 || !luhn32_valid(&vals) {
+        return None;
+    }
+    let mut bits: Vec<u8> = Vec::with_capacity(270);
+    for &v in &vals[..54] {
+        for b in (0..5).rev() {
+            bits.push(((v >> b) & 1) as u8);
+        }
+    }
+    let raw: Vec<u8> = bits[..256].chunks(8).map(|c| c.iter().fold(0u8, |a, &x| (a << 1) | x)).collect();
+    let h = bits[256..].iter().fold(0u32, |a, &x| (a << 1) | x as u32);
+    if h != hash14(&raw) {
+        return None;
+    }
+    Some(hex::encode(raw))
 }
 
 /// 復旧コードから鍵を復元する。大小文字・空白・ハイフンは無視。
-/// 手書きの取り違えに備え、このコードでは使われない数字を文字として読み替える（0→O、8→B、1→I または L）。
-/// 読み替えが正しいかは、コード末尾の誤り検出で確認する
+/// 手書きの取り違えに備え、このコードでは使われない数字を読み替える（0→O、8→B、1→I または L）。
+/// 読み替えが正しいかは、検査文字とハッシュで確認する。1文字の書き間違いは必ずエラーになる。
+/// 1が I か L か判別できない（両方とも検査を通る）場合は、推測せずエラーにする
 pub fn parse_recovery_code(code: &str) -> Result<String> {
-    let s: String = code
-        .chars()
-        .filter(|c| !c.is_whitespace() && *c != '-')
-        .collect::<String>()
-        .to_uppercase()
-        .replace('0', "O")
-        .replace('8', "B");
+    let plain: String = code.to_uppercase().chars().filter(|c| !c.is_whitespace() && *c != '-').collect();
+    let s = plain.replace('0', "O").replace('8', "B");
     let ones = s.matches('1').count();
     if ones > 4 {
         return Err(IbisError("復旧コードの形式が正しくありません。".into()));
     }
-    let mut found: Vec<String> = vec![];
-    for mask in 0..(1u32 << ones) {
-        let mut k = 0;
-        let v: String = s
-            .chars()
-            .map(|c| {
-                if c == '1' {
-                    let r = if (mask >> k) & 1 == 0 { 'I' } else { 'L' };
-                    k += 1;
-                    r
-                } else {
-                    c
-                }
-            })
+    let mut variants = vec![s.clone()];
+    for _ in 0..ones {
+        variants = variants
+            .iter()
+            .flat_map(|v| ["I", "L"].iter().map(move |c| v.replacen('1', c, 1)))
             .collect();
-        if let Ok(raw) = BASE32_NOPAD.decode(v.as_bytes()) {
-            if raw.len() == 34 && Sha256::digest(&raw[..32])[..2] == raw[32..] {
-                let key = hex::encode(&raw[..32]);
-                if !found.contains(&key) {
-                    found.push(key);
-                }
+    }
+    let mut found: Vec<String> = vec![];
+    for v in &variants {
+        if let Some(key) = decode_recovery(v) {
+            if !found.contains(&key) {
+                found.push(key);
             }
         }
     }
     match found.len() {
         1 => Ok(found.remove(0)),
-        0 => Err(IbisError("復旧コードが正しくありません（入力ミスの可能性があります）。".into())),
+        0 if plain.chars().count() != 55 => Err(IbisError("復旧コードの文字数が違います（全55文字）。".into())),
+        0 => Err(IbisError("復旧コードが正しくありません（入力ミスの可能性があります。控えと見比べてください）。".into())),
         // 推測で選ばない（誤った鍵を黙って受け付けない）
         _ => Err(IbisError("1 が I と L のどちらか判別できません。控えを見て、I または L の文字で入力してください。".into())),
     }
