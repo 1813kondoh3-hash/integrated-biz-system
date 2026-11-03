@@ -7,7 +7,7 @@ description = "統合業務システム C案のデータ層（SQLCipher）。Tau
 [dependencies]
 # bundled-sqlcipher：SQLCipherを同梱ビルド（Linux検証ではシステムのOpenSSLを使用）。
 # Windows向けビルドでは bundled-sqlcipher-vendored-openssl に切り替える（OpenSSLをソースからビルドする。Perlが必要）
-rusqlite = { version = "0.31", features = ["bundled-sqlcipher"] }
+rusqlite = { version = "0.41", features = ["bundled-sqlcipher"] }
 sha2 = "0.10"
 hex = "0.4"
 data-encoding = "2"
