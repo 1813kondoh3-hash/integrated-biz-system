@@ -4,6 +4,8 @@
 #   初回は OpenSSL と SQLCipher をソースからビルドするため、時間がかかります（Linuxでの初回は約7分でした）
 param([string]$Features = "vendored-openssl", [switch]$SkipPython)
 $ErrorActionPreference = "Continue"
+$env:PYTHONUTF8 = "1"   # Python の出力を UTF-8 に（Windows の既定の文字コードでは、日本語の出力で落ちるため）
+try { [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false) } catch { }
 $root = Split-Path -Parent $PSScriptRoot
 $report = Join-Path $root "build-report.txt"
 $lines = New-Object System.Collections.ArrayList

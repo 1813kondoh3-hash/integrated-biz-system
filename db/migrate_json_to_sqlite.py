@@ -946,6 +946,12 @@ def verify_migration(data, db_path, key_hex=None):
 
 
 def main():
+    # 標準出力・エラー出力をUTF-8にする（Windowsの既定の文字コード（cp1252・cp932）では、日本語を出力できず落ちることがある）
+    for _s in (sys.stdout, sys.stderr):
+        try:
+            _s.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
     ap = argparse.ArgumentParser(description="統合業務システム JSON⇔SQLite 移行ツール")
     sub = ap.add_subparsers(dest="cmd", required=True)
     a = sub.add_parser("migrate"); a.add_argument("src"); a.add_argument("dst"); a.add_argument("--overwrite", action="store_true"); a.add_argument("--key-file")

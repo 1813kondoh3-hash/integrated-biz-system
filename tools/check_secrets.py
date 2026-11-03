@@ -108,6 +108,12 @@ def git_files(mode):
 
 
 def main(argv=None):
+    # 標準出力・エラー出力をUTF-8にする（Windowsの既定の文字コード（cp1252・cp932）では、日本語を出力できず落ちることがある）
+    for _s in (sys.stdout, sys.stderr):
+        try:
+            _s.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
     ap = argparse.ArgumentParser(description="秘密情報・実データの混入チェック")
     ap.add_argument("files", nargs="*")
     ap.add_argument("--staged", action="store_true")

@@ -8,6 +8,14 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, ROOT)
 import migrate_json_to_sqlite as M  # noqa: E402
 
+os.environ["PYTHONUTF8"] = "1"              # 子プロセス（移行ツールなど）の出力をUTF-8にする（Windowsの既定の文字コードでは、日本語を出力できず落ちる）
+os.environ["PYTHONIOENCODING"] = "utf-8"
+for _s in (sys.stdout, sys.stderr):           # このプロセスの出力も、出力できない文字があっても落ちないようにする
+    try:
+        _s.reconfigure(errors="replace")
+    except Exception:
+        pass
+
 FX = os.path.join(HERE, "fixtures")
 TMP = tempfile.mkdtemp(prefix="ibis_db_test_")
 
@@ -90,11 +98,11 @@ class TestMigration(unittest.TestCase):
         db = os.path.join(TMP, "cli.db")
         out = os.path.join(TMP, "cli.json")
         script = os.path.join(ROOT, "migrate_json_to_sqlite.py")
-        r = subprocess.run([sys.executable, script, "migrate", os.path.join(FX, "rich_v2.json"), db, "--overwrite"], capture_output=True, text=True)
+        r = subprocess.run([sys.executable, script, "migrate", os.path.join(FX, "rich_v2.json"), db, "--overwrite"], capture_output=True, text=True, encoding="utf-8", errors="replace")
         self.assertEqual(r.returncode, 0, r.stderr)
-        r = subprocess.run([sys.executable, script, "verify", os.path.join(FX, "rich_v2.json"), db], capture_output=True, text=True)
+        r = subprocess.run([sys.executable, script, "verify", os.path.join(FX, "rich_v2.json"), db], capture_output=True, text=True, encoding="utf-8", errors="replace")
         self.assertEqual((r.returncode, r.stdout.strip()), (0, "合格"))
-        r = subprocess.run([sys.executable, script, "export", db, out], capture_output=True, text=True)
+        r = subprocess.run([sys.executable, script, "export", db, out], capture_output=True, text=True, encoding="utf-8", errors="replace")
         self.assertEqual(r.returncode, 0)
         with open(out, encoding="utf-8") as f:
             self.assertEqual(M.normalize(fx("rich_v2.json")), M.normalize(json.load(f)))

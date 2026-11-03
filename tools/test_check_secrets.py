@@ -6,6 +6,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import check_secrets as C  # noqa: E402
 
+os.environ["PYTHONUTF8"] = "1"              # 子プロセス（移行ツールなど）の出力をUTF-8にする（Windowsの既定の文字コードでは、日本語を出力できず落ちる）
+os.environ["PYTHONIOENCODING"] = "utf-8"
+for _s in (sys.stdout, sys.stderr):           # このプロセスの出力も、出力できない文字があっても落ちないようにする
+    try:
+        _s.reconfigure(errors="replace")
+    except Exception:
+        pass
+
 HEX = "0123456789abcdef" * 4
 
 

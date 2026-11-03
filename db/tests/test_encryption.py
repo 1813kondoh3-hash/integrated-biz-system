@@ -8,6 +8,14 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, ROOT)
 import migrate_json_to_sqlite as M  # noqa: E402
 
+os.environ["PYTHONUTF8"] = "1"              # 子プロセス（移行ツールなど）の出力をUTF-8にする（Windowsの既定の文字コードでは、日本語を出力できず落ちる）
+os.environ["PYTHONIOENCODING"] = "utf-8"
+for _s in (sys.stdout, sys.stderr):           # このプロセスの出力も、出力できない文字があっても落ちないようにする
+    try:
+        _s.reconfigure(errors="replace")
+    except Exception:
+        pass
+
 try:
     from sqlcipher3 import dbapi2 as sc
 except Exception:                      # pragma: no cover
@@ -235,7 +243,7 @@ class TestCli(unittest.TestCase):
         keyf = os.path.join(TMP, "cli_key.txt")
         db = os.path.join(TMP, "cli_enc.db")
         out = os.path.join(TMP, "cli_enc.json")
-        run = lambda *a: subprocess.run([sys.executable, script, *a], capture_output=True, text=True)
+        run = lambda *a: subprocess.run([sys.executable, script, *a], capture_output=True, text=True, encoding="utf-8", errors="replace")
         r = run("keygen", keyf)
         self.assertEqual(r.returncode, 0, r.stderr)
         code = [ln.strip() for ln in r.stdout.splitlines() if "-" in ln and len(ln.strip()) > 40][0]
@@ -273,7 +281,7 @@ class TestRecoverySheet(unittest.TestCase):
 
     def test_cli_sheet_and_check_code(self):
         script = os.path.join(ROOT, "migrate_json_to_sqlite.py")
-        run = lambda *a: subprocess.run([sys.executable, script, *a], capture_output=True, text=True)
+        run = lambda *a: subprocess.run([sys.executable, script, *a], capture_output=True, text=True, encoding="utf-8", errors="replace")
         keyf = os.path.join(TMP, "sheet_key.txt"); sheet = os.path.join(TMP, "sheet.html")
         r = run("keygen", keyf); self.assertEqual(r.returncode, 0, r.stderr)
         code = [ln.strip() for ln in r.stdout.splitlines() if "-" in ln and len(ln.strip()) > 40][0]

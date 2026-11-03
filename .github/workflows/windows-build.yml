@@ -10,6 +10,8 @@ permissions:
 jobs:
   windows:
     runs-on: windows-latest
+    env:
+      PYTHONUTF8: "1"        # Windows の既定の文字コードでは、日本語の出力で落ちるため
     defaults:
       run:
         shell: pwsh
