@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule: { interval: "weekly" }
+  - package-ecosystem: "cargo"
+    directory: "/rust/ibis-core"
+    schedule: { interval: "weekly" }
+  - package-ecosystem: "npm"
+    directory: "/app"
+    schedule: { interval: "weekly" }
+  - package-ecosystem: "pip"
+    directory: "/db"
+    schedule: { interval: "weekly" }

@@ -1,0 +1,51 @@
+# Windows でのビルド確認（手動実行）。Actions タブ →「Windows build check」→ Run workflow
+# 目的：手元の Windows 実機が無くても、OpenSSL（SQLCipher用）のソースビルドと Rust のテストが
+#       Windows で通るかを、GitHub の Windows 環境で確かめる。※ 作成時点では未実行（未検証）
+name: Windows build check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Perl と NASM を確認（OpenSSLのソースビルドに使う）
+        run: |
+          choco install nasm strawberryperl -y --no-progress
+          Add-Content -Path $env:GITHUB_PATH -Value "C:\Program Files\NASM"
+        continue-on-error: true
+      - name: 版の表示
+        run: |
+          rustc --version; cargo --version
+          perl -v | Select-Object -First 2
+          nasm -v
+
+      - name: Rust のテスト（OpenSSL をソースから同梱）
+        working-directory: rust/ibis-core
+        run: cargo test --features vendored-openssl 2>&1 | Tee-Object -FilePath ..\..\rust-test.log
+
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: DB のテスト（暗号化なし）
+        run: python db/tests/run_tests.py 2>&1 | Tee-Object -FilePath db-test.log
+      - name: 暗号化のテスト（sqlcipher3-wheels が Windows 用に提供されている場合）
+        run: |
+          pip install -r db/requirements.txt
+          python db/tests/test_encryption.py 2>&1 | Tee-Object -FilePath enc-test.log
+        continue-on-error: true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-build-logs
+          path: |
+            rust-test.log
+            db-test.log
+            enc-test.log

@@ -1,0 +1,55 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+
+jobs:
+  secrets-scan:
+    name: 秘密情報・実データの混入チェック
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python tools/test_check_secrets.py
+      - run: python tools/check_secrets.py --all
+
+  app-tests:
+    name: アプリ（単一HTML）のテスト
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+        working-directory: app
+      - run: npm test
+        working-directory: app
+
+  db-tests:
+    name: DB設計・移行・暗号化のテスト
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r db/requirements.txt
+      - run: python db/tests/run_tests.py
+      - run: python db/tests/test_encryption.py
+
+  rust-interop:
+    name: Rust ⇄ Python の相互運用テスト
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r db/requirements.txt
+      - run: sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config
+      - run: python db/tests/cross_check.py
