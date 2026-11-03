@@ -33,7 +33,7 @@ jobs:
         working-directory: rust/ibis-core
         run: cargo test --features vendored-openssl 2>&1 | Tee-Object -FilePath ..\..\rust-test.log
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with: { python-version: "3.12" }
       - name: DB のテスト（暗号化なし）
         run: python db/tests/run_tests.py 2>&1 | Tee-Object -FilePath db-test.log
