@@ -40,7 +40,9 @@ jobs:
       - name: 暗号化のテスト（sqlcipher3-wheels が Windows 用に提供されている場合）
         run: |
           pip install -r db/requirements.txt
-          python -X faulthandler -u db/tests/test_encryption.py -v 2>&1 | Tee-Object -FilePath enc-test.log
+          cmd /c "python -X faulthandler -u db\tests\test_encryption.py -v > enc-test.log 2>&1"
+          Write-Host "python exit code = $LASTEXITCODE"
+          Get-Content enc-test.log -Encoding UTF8
         continue-on-error: true
 
       - uses: actions/upload-artifact@v4
