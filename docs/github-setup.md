@@ -21,7 +21,7 @@ cd integrated-biz-system
 git remote set-url origin https://github.com/<アカウント>/integrated-biz-system.git
 git push -u origin main --tags
 ```
-（zip を使う場合：展開すると `.git` フォルダ（隠しフォルダ）が含まれています。展開したフォルダで、`git remote add origin …` のあと、`git push -u origin main --tags`）
+（zip は、履歴を含まない**閲覧用のスナップショット**です。GitHubへ登録するときは、必ず `.bundle` を使ってください）
 
 ### 作者情報の変更（push の前に）
 基準版のコミットは、ダミーの作者（`Integrated Biz System <dev@example.invalid>`）で作られています。**push の前に**、ご自身の名前に直せます。
