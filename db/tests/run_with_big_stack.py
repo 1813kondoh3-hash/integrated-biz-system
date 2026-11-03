@@ -1,12 +1,12 @@
 """テストを、大きなスタック（作業領域）を持つスレッドで実行する。Windowsでのスタック不足の切り分け用。
 使い方: python run_with_big_stack.py <テストのファイル> [引数...]
-スタックの大きさは、環境変数 IBIS_STACK_MB で変えられる（既定 256MB）"""
+スタックの大きさは、環境変数 IBIS_STACK_MB で変えられる（既定 128MB。WindowsのPythonは256MB未満まで）"""
 import os
 import runpy
 import sys
 import threading
 
-STACK_MB = int(os.environ.get("IBIS_STACK_MB", "256"))
+STACK_MB = int(os.environ.get("IBIS_STACK_MB", "128"))
 
 
 def main():
