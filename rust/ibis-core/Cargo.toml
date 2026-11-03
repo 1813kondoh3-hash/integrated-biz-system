@@ -1,0 +1,18 @@
+[package]
+name = "ibis-core"
+version = "0.1.0"
+edition = "2021"
+description = "統合業務システム C案のデータ層（SQLCipher）。Tauri のバックエンドから使う想定の最小ライブラリ"
+
+[dependencies]
+# bundled-sqlcipher：SQLCipherを同梱ビルド（Linux検証ではシステムのOpenSSLを使用）。
+# Windows向けビルドでは bundled-sqlcipher-vendored-openssl に切り替える（OpenSSLをソースからビルドする。Perlが必要）
+rusqlite = { version = "0.31", features = ["bundled-sqlcipher"] }
+sha2 = "0.10"
+hex = "0.4"
+data-encoding = "2"
+rand = "0.8"
+
+[features]
+# Windows向け：OpenSSLをソースからビルドして同梱する（Perl と NASM が必要になる場合がある）
+vendored-openssl = ["rusqlite/bundled-sqlcipher-vendored-openssl"]
