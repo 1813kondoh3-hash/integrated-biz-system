@@ -247,7 +247,8 @@ class TestCli(unittest.TestCase):
         r = run("keygen", keyf)
         self.assertEqual(r.returncode, 0, r.stderr)
         code = [ln.strip() for ln in r.stdout.splitlines() if "-" in ln and len(ln.strip()) > 40][0]
-        self.assertEqual(oct(stat.S_IMODE(os.stat(keyf).st_mode)), oct(0o600))
+        if os.name == "posix":   # Windows のファイルには、本人だけに制限する権限の設定（0600）が無い
+            self.assertEqual(oct(stat.S_IMODE(os.stat(keyf).st_mode)), oct(0o600))
         self.assertNotEqual(run("keygen", keyf).returncode, 0, "既存の鍵ファイルを上書きしてはならない")
         self.assertEqual(M.parse_recovery_code(code), M.read_key_file(keyf))
         r = run("migrate", os.path.join(FX, "rich_v2.json"), db, "--overwrite", "--key-file", keyf)
@@ -286,7 +287,8 @@ class TestRecoverySheet(unittest.TestCase):
         r = run("keygen", keyf); self.assertEqual(r.returncode, 0, r.stderr)
         code = [ln.strip() for ln in r.stdout.splitlines() if "-" in ln and len(ln.strip()) > 40][0]
         r = run("recovery-sheet", keyf, sheet, "--label", "テスト"); self.assertEqual(r.returncode, 0, r.stderr)
-        self.assertEqual(oct(stat.S_IMODE(os.stat(sheet).st_mode)), oct(0o600))
+        if os.name == "posix":   # Windows のファイルには、本人だけに制限する権限の設定（0600）が無い
+            self.assertEqual(oct(stat.S_IMODE(os.stat(sheet).st_mode)), oct(0o600))
         self.assertNotEqual(run("recovery-sheet", keyf, sheet).returncode, 0, "既存の控えを上書きしない")
         with open(sheet, encoding="utf-8") as f:
             self.assertIn(code.split("-")[0], f.read())

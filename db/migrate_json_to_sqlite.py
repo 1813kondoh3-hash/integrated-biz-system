@@ -972,6 +972,8 @@ def main():
             print("鍵ファイルを作成しました:", args.out)
             print("復旧コード（紙に印刷して、PCとは別の場所に保管してください）:")
             print("  " + recovery_code(kh))
+            if os.name == "nt":
+                print("注意：Windowsでは、ファイルの権限が本人だけに制限されません。ファイルは、自分だけがアクセスできるフォルダ（BitLockerで保護したドライブ上など）に置いてください。")
         elif args.cmd == "recovery-sheet":
             html = recovery_sheet_html(read_key_file(args.keyfile), args.label)
             fd = os.open(args.out, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)      # 既存ファイルは上書きしない
@@ -979,6 +981,8 @@ def main():
                 f.write(html)
             print("控え用紙を作成しました:", args.out)
             print("ブラウザで開いて印刷し、印刷後はこのファイルを削除してください。")
+            if os.name == "nt":
+                print("注意：Windowsでは、ファイルの権限が本人だけに制限されません。ファイルは、自分だけがアクセスできるフォルダ（BitLockerで保護したドライブ上など）に置いてください。")
         elif args.cmd == "check-code":
             if parse_recovery_code(args.code) == read_key_file(args.keyfile):
                 print("一致しました。このコードで鍵を復元できます。")
