@@ -35,7 +35,7 @@ docs/       手順書（Windowsビルド、GitHub、復旧コード、セキュ�
 ### テストを実行する
 | 対象 | コマンド | 期待する結果 |
 |---|---|---|
-| アプリ | `cd app && npm ci && npm test` | すべて合格 |
+| アプリ | `cd app && npm ci && npm test`（**Node.js 22.22.2 以上**、または 24.15 以上） | すべて合格 |
 | DB・移行 | `python db/tests/run_tests.py` | 34件 OK |
 | 暗号化 | `pip install -r db/requirements.txt` → `python db/tests/test_encryption.py` | 17件 OK |
 | Rust⇄Python | `python db/tests/cross_check.py`（cargo が必要） | OK（Rust 4件を含む） |

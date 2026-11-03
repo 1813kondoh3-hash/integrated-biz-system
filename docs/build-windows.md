@@ -33,7 +33,7 @@ winget のIDは変わることがあります。見つからないときは `win
 | 2-4 | Perl | `winget install --id StrawberryPerl.StrawberryPerl -e` | OpenSSLをソースからビルドするため |
 | 2-5 | NASM | `winget install --id NASM.NASM -e` → `C:\Program Files\NASM` を PATH に追加 | 同上。PATHへの追加は、システムのプロパティ → 環境変数 |
 | 2-6 | Python（任意） | `winget install --id Python.Python.3.12 -e` | DBのテスト用 |
-| 2-7 | Node.js（任意） | `winget install --id OpenJS.NodeJS.LTS -e` | アプリのテスト用 |
+| 2-7 | Node.js（任意） | `winget install --id OpenJS.NodeJS.LTS -e` | アプリのテスト用。**22.22.2 以上、または 24.15 以上**が必要（テストに使う jsdom の要件）。古い版だと、テストの開始前に `Cannot read properties of undefined (reading 'bind')` で止まる |
 | 2-8 | WebView2 | 通常は不要 | Windows 10（1803以降）は標準で入っているとされます。Tauri化の段階で必要。無ければ Microsoft の「WebView2 ランタイム（Evergreen Bootstrapper）」を入れる |
 
 > OpenSSL を Perl・NASM でビルドする必要があるかは、Windowsでの実際のビルドで確定します（第9章）。
