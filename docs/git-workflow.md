@@ -39,3 +39,12 @@ python tools/check_secrets.py --staged  # 秘密情報・実データのチェ�
 cd app && npm ci && cd ../db/tests
 NODE_PATH=../../app/node_modules node gen_fixtures.js
 ```
+
+## 依存ライブラリの更新（Dependabot）
+- 更新の提案は月1回、同時に3件までです
+- **GitHub Actions・npm・pip**：CIが緑になったPull Requestを、1件ずつマージする（マージのたびに残りが自動で再実行される）。`upload-artifact` は手動実行のWindows確認でしか使わないため、マージ後に「Windows build check」を1回実行して確認する
+- **Rust（rusqlite・sha2・rand）**：自動では提案しない設定にしている。DBの暗号化と、操作ログ・内容ハッシュの形式に直結するため。四半期ごとに更新の有無を確認し、上げるときは次を確認してから手動で行う
+  1. `python db/tests/cross_check.py`（Pythonとの相互運用）と `python db/tests/test_encryption.py` が通る
+  2. 既存の暗号化DBが、新しい版で開ける（SQLCipherの版が変わる場合は、互換性を確認する）
+  3. Windowsでのビルド（`windows-build.yml`）が通る
+- セキュリティの更新は、この設定とは別に通知されることがあります（GitHubの設定・プランによる。要確認）
