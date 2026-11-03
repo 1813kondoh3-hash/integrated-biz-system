@@ -11,7 +11,6 @@ updates:
     ignore:
       # 暗号化DB（SQLCipher）の版・操作ログのハッシュ形式を決める中核のため、自動では上げない。
       # 上げるときは、PythonとRustの相互運用テスト（db/tests/cross_check.py）で互換性を確認してから、手動で行う。
-      # 見直しは四半期ごと（docs/git-workflow.md「依存ライブラリの更新」）
       - dependency-name: "rusqlite"
       - dependency-name: "sha2"
       - dependency-name: "rand"
