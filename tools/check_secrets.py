@@ -97,12 +97,14 @@ def read_text(path):
 
 
 def git_files(mode):
-    cmd = ["git", "diff", "--cached", "--name-only", "--diff-filter=ACM"] if mode == "staged" else ["git", "ls-files"]
-    r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+    """git が管理するファイルの一覧。-z（NUL区切り）を使う：日本語などのファイル名は、通常の出力では
+    引用符つきの表記に変えられ、拡張子の判定や読み込みができなくなるため"""
+    cmd = ["git", "diff", "--cached", "--name-only", "--diff-filter=ACM", "-z"] if mode == "staged" else ["git", "ls-files", "-z"]
+    r = subprocess.run(cmd, capture_output=True)
     if r.returncode != 0:
-        print("gitの実行に失敗しました:", r.stderr.strip(), file=sys.stderr)
+        print("gitの実行に失敗しました:", r.stderr.decode("utf-8", "replace").strip(), file=sys.stderr)
         sys.exit(2)
-    return [ln for ln in r.stdout.splitlines() if ln.strip()]
+    return [p for p in r.stdout.decode("utf-8", "replace").split("\0") if p.strip()]
 
 
 def main(argv=None):

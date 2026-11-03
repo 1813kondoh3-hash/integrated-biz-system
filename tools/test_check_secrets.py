@@ -98,6 +98,21 @@ class TestCli(unittest.TestCase):
         r = self.check("--staged"); self.assertEqual(r.returncode, 1)
         self.assertNotIn(HEX, r.stdout + r.stderr, "鍵の値は出力に出ない")
 
+    def test_japanese_file_names_are_checked(self):
+        """日本語のファイル名（gitは通常、引用符つきの表記にする）でも、拡張子で止まる"""
+        for name in ("見積一覧.xlsx", "取引先リスト 2026.csv", "フォルダ/請求データ.xlsm"):
+            self.write(name, "x"); self.run("git", "add", "-f", name)
+        r = self.check("--staged")
+        self.assertEqual(r.returncode, 1, r.stdout)
+        for name in ("見積一覧.xlsx", "取引先リスト 2026.csv", "請求データ.xlsm"):
+            self.assertIn(name, r.stdout)
+        r2 = self.check("--all"); self.assertEqual(r2.returncode, 1)
+
+    def test_japanese_file_name_content_is_scanned(self):
+        self.write("メモ/鍵のメモ.md", f"鍵：{HEX}\n"); self.run("git", "add", "-f", "メモ/鍵のメモ.md")
+        r = self.check("--staged"); self.assertEqual(r.returncode, 1, r.stdout)
+        self.assertIn("鍵のメモ.md", r.stdout)
+
     def test_untracked_files_are_not_checked_when_staged(self):
         self.write("ok.md"); self.run("git", "add", "ok.md"); self.write("secret.key")
         self.assertEqual(self.check("--staged").returncode, 0)

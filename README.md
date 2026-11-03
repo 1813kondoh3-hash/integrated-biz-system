@@ -39,7 +39,7 @@ docs/       手順書（Windowsビルド、GitHub、復旧コード、セキュ�
 | DB・移行 | `python db/tests/run_tests.py` | 34件 OK |
 | 暗号化 | `pip install -r db/requirements.txt` → `python db/tests/test_encryption.py` | 17件 OK |
 | Rust⇄Python | `python db/tests/cross_check.py`（cargo が必要） | OK（Rust 4件を含む） |
-| 秘密情報チェック | `python tools/test_check_secrets.py` | 12件 OK |
+| 秘密情報チェック | `python tools/test_check_secrets.py` | 15件 OK |
 
 ### Windowsでビルドする
 [docs/build-windows.md](docs/build-windows.md) を参照してください（`tools\check-env.ps1` で環境を確認できます）。
