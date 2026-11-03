@@ -6,7 +6,7 @@ import runpy
 import sys
 import threading
 
-STACK_MB = int(os.environ.get("IBIS_STACK_MB", "128"))
+STACK_MB = int(os.environ.get("IBIS_STACK_MB", "128"))   # WindowsのPythonは256MB未満まで
 
 
 def main():
