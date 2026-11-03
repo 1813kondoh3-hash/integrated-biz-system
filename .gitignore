@@ -1,0 +1,40 @@
+# ===== 依存・ビルド成果物 =====
+node_modules/
+target/
+__pycache__/
+*.pyc
+.venv/
+*.log
+
+# ===== 実データ・鍵・バックアップ：絶対に登録しない（tools/check_secrets.py も止める） =====
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.key
+*.pem
+*.pfx
+*.p12
+*.jks
+*.keystore
+*.bak
+.env
+.env.*
+key.txt
+*recovery*.html
+integrated_biz_backup_*.json
+integrated_biz_auto_*.json
+
+# ===== 見積金額・取引データになりうるもの =====
+*.xlsx
+*.xlsm
+*.xls
+*.csv
+*.tsv
+
+# ===== 作業用 =====
+env-report.txt
+build-report.txt
+.DS_Store
+Thumbs.db

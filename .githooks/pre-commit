@@ -1,0 +1,8 @@
+#!/bin/sh
+# コミット前の秘密情報・実データのチェック（有効化：tools/install-hooks.ps1 または tools/install-hooks.sh）
+PY=$(command -v python3 || command -v python || command -v py)
+if [ -z "$PY" ]; then
+  echo "Python が見つからないため、秘密情報のチェックができません。Python を入れてから、もう一度コミットしてください。"
+  exit 1
+fi
+exec "$PY" tools/check_secrets.py --staged

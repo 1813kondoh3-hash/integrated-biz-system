@@ -1,0 +1,6 @@
+* text=auto eol=lf
+# PowerShell 5.1 は BOM付きUTF-8でないと日本語が文字化けする。改行はCRLF
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.png binary
+*.zip binary
