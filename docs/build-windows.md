@@ -3,7 +3,7 @@
 Rustのデータ層（`rust/ibis-core`）を Windows 10 でビルドし、暗号化DB（SQLCipher）が動くことを確認するための手順です。
 Tauriアプリ化（次の段階）の土台でもあります。
 
-> **この手順書の状態**：Linux上での検証結果と公式資料に基づいて作成しました。**Windows実機では未検証です**（第9章）。
+> **この手順書の状態**：Linux上での検証結果と公式資料に基づいて作成し、**GitHubのWindows環境（`windows-build.yml`）で、ビルドとテストを確認済み**です（2026年11月）。**Windows 10 実機では未検証**です（DPAPI・SmartScreenなど。第9章）。
 > うまくいかない箇所があれば、`tools\collect-report.ps1` の出力（`env-report.txt`）を共有してください。環境変数・パスワード・鍵・データは含まれません（ユーザー名は `<user>` に置き換わります）。
 
 ---
@@ -154,6 +154,7 @@ vcpkg のトリプレット名・環境変数は、実機で確認が必要で�
 | `vendored-openssl`（OpenSSLをソースから同梱）のビルドとテスト | **Linuxで確認済み**（初回ビルド約6分40秒、Rustのテスト4件が合格、OpenSSLは静的に同梱）。OpenSSLの最新版が Rust 1.80 以上を要求するため、この環境（Rust 1.75）では `openssl-sys` を 0.9.109 に固定した（`Cargo.lock`）。Windowsで最新のRustを使う場合も、固定した版で動く想定 |
 | PowerShell スクリプトの構文 | PowerShell 7.4 の構文解析器で確認済み（5.1 でも動く書き方にしている） |
 | PowerShell スクリプトの動作 | Linux上の PowerShell で、Windows固有でない部分（版の確認、報告書の作成、ユーザー名の置き換え）を確認済み。レジストリ・`vswhere` など Windows固有の部分は未確認 |
-| GitHub Actions（CI） | YAMLの構文を確認済み。**実行は未確認** |
-| `windows-build.yml`（手動実行） | **未実行**。GitHubのWindows環境で、第5章と同じ確認ができる |
+| GitHub Actions（CI） | **実行して緑を確認済み**（4ジョブ。アプリのテストは Node.js 22、Python の出力は `PYTHONUTF8=1`） |
+| `windows-build.yml`（手動実行） | **GitHubのWindows環境で確認済み**：DBテスト34件が合格、Rustのテスト4件が合格（`vendored-openssl`、ビルド約9分、4回連続）。Pythonの暗号化テストは8件が合格し、暗号化DBを使う12件は省略（次の行） |
+| Windows版 `sqlcipher3-wheels`（Python） | **暗号化DBにスキーマを作る処理でクラッシュ**する（作業領域を128MBに広げても再現）。そのため、Windowsでは移行ツールの暗号化を止め、暗号化DBはRust側（アプリ）で扱う |
 | Windows 10 実機 | **未検証**（Perl・NASMが必要かの確定、所要時間、SmartScreenの挙動、DPAPI） |

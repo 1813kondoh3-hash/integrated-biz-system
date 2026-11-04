@@ -8,7 +8,11 @@ PCが壊れたとき、Windowsを入れ直したとき、ユーザーの資格�
 
 ## 作り方（現在の移行ツールの場合）
 
-PowerShell（またはターミナル）で、リポジトリの `db` フォルダに移動して実行します。`sqlcipher3-wheels` が必要です（`pip install -r requirements.txt`）。
+PowerShell（またはターミナル）で、**リポジトリの `db` フォルダに移動して**実行します（例：`cd C:\work\integrated-biz-system\db`）。
+鍵の作成・控え用紙・確認の3つは暗号化ライブラリを使わないため、**`pip install` は不要**です（Windowsでも、そのまま使えます）。
+鍵を置くフォルダが無い場合は、先に作ります：`New-Item -ItemType Directory -Force C:\ibis-key`
+
+> **画面に復旧コードが表示されます。** その画面のスクリーンショットを撮ったり、チャットやメールに貼ったりしないでください。
 
 ```powershell
 # 1) 鍵ファイルを作る（256ビットの鍵。画面に復旧コードが表示されます）
@@ -18,7 +22,8 @@ python migrate_json_to_sqlite.py keygen C:\ibis-key\key.txt
 python migrate_json_to_sqlite.py recovery-sheet C:\ibis-key\key.txt C:\ibis-key\sheet.html --label "事務所PC"
 
 # 3) sheet.html をブラウザで開いて印刷する
-# 4) 控えを見ながらコードを入力して、鍵と一致するか確認する（再入力による確認）
+# 4) 印刷した紙を見ながら、コードを手で入力して確認する（画面のコードをコピーしない）。
+#    「一致しました。このコードで鍵を復元できます。」と出れば、控えは正しい
 python migrate_json_to_sqlite.py check-code C:\ibis-key\key.txt "ここに紙のコードを書き写して入力"
 
 # 5) 一致を確認できたら、sheet.html を削除する（ごみ箱も空にする）

@@ -52,7 +52,7 @@ Windows実機が手元に無くても、GitHubのWindows環境で、Rustのビ�
 2. 完了後、ログと、成果物（`windows-build-logs`）を確認する
 3. 失敗した場合は、ログの該当部分を共有する（Perl・NASM の用意、OpenSSL のビルドが主な原因）
 
-※ 作成時点では未実行です。
+※ 2026年11月に実行し、緑を確認済みです（DBテスト34件、Rustのテスト4件。Pythonの暗号化テストは、Windowsでは暗号化DBを使う12件を省略）。
 
 ## 6. 日常の流れ
 [git-workflow.md](git-workflow.md) を参照してください。
