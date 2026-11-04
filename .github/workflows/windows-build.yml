@@ -53,3 +53,4 @@ jobs:
             rust-test.log
             db-test.log
             enc-test.log
+            rust/ibis-core/target/debug/ibis-key.exe
