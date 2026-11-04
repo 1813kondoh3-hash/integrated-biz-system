@@ -1,6 +1,11 @@
 # 変更履歴
 
 ## [未リリース]
+### 追加
+- 鍵の保護（DPAPI）：`ibis-core` に keystore を追加（保管場所は `%LOCALAPPDATA%\IntegratedBizSystem\key.dpapi`）。新しい鍵は復旧コードの再入力で確認してから保存、既存の保管ファイルは上書きしない、改ざん・破損を指紋で検出、移行ツールの鍵ファイルの取り込み、復旧コードからの復元
+- 確認用のコマンド `ibis-key`（status・init・import・restore・check-code）。鍵そのものは表示しない
+- テスト：保管の仕組み3件・コマンド2件（全OS）、DPAPI 2件（Windowsのみ）。Linux上でDPAPIのコードを型の検査する feature `dpapi-typecheck`
+
 ### 文書
 - 復旧コードの手順書：`pip install` は不要なこと、`db` フォルダで実行すること、鍵のフォルダの作り方、紙を見て手で入力することを追記（不正確だった記載を修正）
 - Windowsビルド手順書・README・GitHub手順書：GitHubのWindows環境での確認結果に更新（Windows 10 実機は未検証のまま）

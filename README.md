@@ -13,6 +13,7 @@
 | DB設計（SQLite） | 設計・移行ツール・検証まで完了（27テーブル／27トリガー／5ビュー）。発行済み・締め済み・追記専用をDB自体が強制 |
 | 暗号化（SQLCipher） | 決定済み。暗号化DBでの動作、PythonとRustの相互運用を検証済み。復旧コードは検査文字つき（1文字の書き間違いを必ず検出）。**Windowsでは、暗号化DBはRust側で扱う**（Windows版のPython用ライブラリが不安定なため） |
 | Rust データ層（`ibis-core`） | 最小実装あり。**GitHubのWindows環境で、ビルドとテストを確認済み**（OpenSSLをソースから同梱）。Windows 10 実機は未検証 |
+| 鍵の保護（DPAPI） | 実装済み（`ibis-core` の keystore と確認用コマンド `ibis-key`）。Linuxでテスト済み、Windowsでの実行確認はこれから（[docs/key-protection.md](docs/key-protection.md)） |
 | Tauri アプリ | 未着手 |
 | コード署名 | 1年間は取得しない（2027年11月に見直し） |
 

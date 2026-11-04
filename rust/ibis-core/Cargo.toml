@@ -12,7 +12,15 @@ sha2 = "0.10"
 hex = "0.4"
 data-encoding = "2"
 rand = "0.8"
+# Linux上で、WindowsのAPI（DPAPI）の呼び出し方を型の検査で確かめるためだけに使う（feature dpapi-typecheck）
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Security_Cryptography"], optional = true }
+
+[target.'cfg(windows)'.dependencies]
+# DPAPI（鍵の保護）。Microsoft公式のWindows APIの宣言だけのライブラリ
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Security_Cryptography"] }
 
 [features]
 # Windows向け：OpenSSLをソースからビルドして同梱する（Perl と NASM が必要になる場合がある）
 vendored-openssl = ["rusqlite/bundled-sqlcipher-vendored-openssl"]
+# Linux上で cargo check --features dpapi-typecheck とすると、DPAPIのコードを型の検査だけする（実行はWindowsでのみ）
+dpapi-typecheck = ["dep:windows-sys"]

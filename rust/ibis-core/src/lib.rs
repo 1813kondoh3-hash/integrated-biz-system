@@ -1,6 +1,8 @@
 //! 統合業務システム C案：データ層（SQLCipher）の最小実装。
 //! 目的は「Rust＋rusqlite＋SQLCipher で、設計済みのスキーマ・トリガー・暗号化・操作ログ・復旧コードが
 //! Pythonの参照実装と互換に動く」ことの確認。画面（Tauri）はこの上に載せる。
+pub mod keystore;
+
 use rand::RngCore;
 use rusqlite::{params, Connection};
 use sha2::{Digest, Sha256};
