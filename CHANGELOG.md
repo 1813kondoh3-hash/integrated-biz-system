@@ -1,12 +1,25 @@
 # 変更履歴
 
 ## [未リリース]
+### 追加（デスクトップアプリ）
+- Tauri 2 のデスクトップアプリ（最小版）：暗号鍵の用意（鍵ファイルの取り込み・復旧コードからの復元・新しい鍵の作成と再入力による確認・紙のコードとの照合）、暗号化した空のDBの作成（上書きしない）、暗号化したままのバックアップ（作成後に開けることを確認）。今のデータ（JSON）の取り込みは次の段階
+- `ibis-core` に appcore（状態の確認・DBの作成・バックアップ）を追加。テスト4件（平文が残らない、別の鍵では開けない、状態の確認でDBを変更しない など）
+- `desktop-build.yml`：GitHubのWindows環境でアプリ（exe）を作る（手動実行）。成果物に SHA-256 を記録
+
 ### 追加
 - 鍵の保護（DPAPI）：`ibis-core` に keystore を追加（保管場所は `%LOCALAPPDATA%\IntegratedBizSystem\key.dpapi`）。新しい鍵は復旧コードの再入力で確認してから保存、既存の保管ファイルは上書きしない、改ざん・破損を指紋で検出、移行ツールの鍵ファイルの取り込み、復旧コードからの復元
 - 確認用のコマンド `ibis-key`（status・init・import・restore・check-code）。鍵そのものは表示しない
 - テスト：保管の仕組み3件・コマンド2件（全OS）、DPAPI 2件（Windowsのみ）。Linux上でDPAPIのコードを型の検査する feature `dpapi-typecheck`
 
+### 確認
+- 鍵の保護（DPAPI）を、GitHubのWindows環境（DPAPIのテスト2件を含むRustのテスト11件が合格）と、Windows 10 実機（`ibis-key` の import・status・check-code）で確認した。平文の鍵ファイルは削除し、鍵はDPAPIの保管と紙の復旧コードで管理する
+
+### CI
+- `windows-build.yml`：成果物（`windows-build-logs`）に `ibis-key.exe` を追加
+- Dependabot の提案で、Actions の版を更新（checkout・setup-node・setup-python・upload-artifact）
+
 ### 文書
+- 鍵の保護の手順書・README・Windowsビルド手順書：DPAPIの確認結果を反映。成果物の場所、「再実行」と「ワークフローを実行する」の違い、PowerShellへの貼り付けで `elseif` が止まる場合の対処を追記
 - 復旧コードの手順書：`pip install` は不要なこと、`db` フォルダで実行すること、鍵のフォルダの作り方、紙を見て手で入力することを追記（不正確だった記載を修正）
 - Windowsビルド手順書・README・GitHub手順書：GitHubのWindows環境での確認結果に更新（Windows 10 実機は未検証のまま）
 

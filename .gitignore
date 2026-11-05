@@ -38,3 +38,6 @@ env-report.txt
 build-report.txt
 .DS_Store
 Thumbs.db
+
+# ===== デスクトップアプリ（Tauri）が自動で作るもの =====
+desktop/src-tauri/gen/

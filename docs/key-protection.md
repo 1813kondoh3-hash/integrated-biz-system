@@ -19,7 +19,10 @@ DBを暗号化する鍵を、Windowsの仕組み（DPAPI）で保護して保管
 
 ## 2. 確認用のコマンド `ibis-key`
 
-GitHubの「Windows build check」の成果物（`windows-build-logs`）に、`ibis-key.exe` が入っています。PowerShellで、exe を置いたフォルダに移動して実行します。
+GitHubの「Windows build check」の成果物（`windows-build-logs`、約2.7MB）に、`ibis-key.exe` が入っています。zipを展開すると、ログとは別の `rust\ibis-core\target\debug\` フォルダの中にあります。PowerShellで、exe を置いたフォルダに移動して実行します。
+
+- 成果物を作るときは、Actions のワークフローの画面の「**ワークフローを実行する**」（Run workflow）から実行します。実行の画面の「**再実行**」（Re-run）は、前回と同じコミットで動かすため、あとから入れた変更が反映されません。
+- 成果物のサイズが10KB前後なら、ログだけで `ibis-key.exe` は入っていません。
 
 | コマンド | 内容 |
 |---|---|
@@ -45,5 +48,5 @@ GitHubの「Windows build check」の成果物（`windows-build-logs`）に、`i
 |---|---|
 | 保管の仕組み（確認つきの保存、上書き防止、改ざん・破損の検出、取り込み、復元） | Linuxでテスト済み（テスト用の保護で） |
 | DPAPIを呼ぶコードの型の検査 | Linux上で確認済み（`cargo check --tests --features dpapi-typecheck`） |
-| DPAPIの実際の動作 | GitHubのWindows環境のテストで確認する（`dpapi_roundtrip_and_tamper_detection`、`dpapi_store_end_to_end`） |
-| Windows 10 実機 | 第3章の手順で確認する |
+| DPAPIの実際の動作 | **GitHubのWindows環境で確認済み**（`dpapi_roundtrip_and_tamper_detection`・`dpapi_store_end_to_end` が合格。Rustのテストは合計11件すべて合格） |
+| Windows 10 実機 | **確認済み**（2026-11-05）：第3章の手順で、取り込み（`import`）・状態の確認（`status`：保管方式はWindows DPAPI、鍵を正しく開けた）・紙の復旧コードとの照合（`check-code`：一致）がすべて成功。平文の鍵ファイルは削除済み。鍵は、DPAPIの保管ファイルと紙の復旧コードの2つで管理している |

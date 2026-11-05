@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統合業務システム（データの準備）</title>
+<link rel="stylesheet" href="style.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="準備の手順">
+    <h1 class="brand">統合業務システム<span>データの準備</span></h1>
+    <ol class="steps">
+      <li><button class="step" data-go="key" type="button"><b class="mark" id="m-key"></b>暗号鍵を用意する</button></li>
+      <li><button class="step" data-go="db" type="button"><b class="mark" id="m-db"></b>データベースを作る</button></li>
+      <li><button class="step" data-go="migrate" type="button"><b class="mark later"></b>今のデータを移す</button></li>
+      <li><button class="step" data-go="backup" type="button"><b class="mark" id="m-backup"></b>バックアップを取る</button></li>
+    </ol>
+    <p class="ver" id="ver"></p>
+  </nav>
+
+  <main>
+    <div class="notice" id="notice" role="status" hidden></div>
+
+    <!-- 1. 鍵 -->
+    <section class="pane" id="p-key" hidden>
+      <h2>暗号鍵を用意する</h2>
+      <p class="lead">データベースは、この鍵で暗号化します。鍵はWindowsの仕組み（DPAPI）で守られ、このPCのこのユーザーでだけ開けます。</p>
+      <dl class="facts" id="key-facts"></dl>
+
+      <div id="key-setup" hidden>
+        <h3>鍵の用意のしかたを選んでください</h3>
+        <div class="choices">
+          <div class="choice">
+            <h4>移行ツールで作った鍵ファイルを取り込む</h4>
+            <p>key.txt を作ってある場合。取り込んだあと、紙の復旧コードと一致するか確かめます。</p>
+            <button type="button" id="btn-import">鍵ファイルを選んで取り込む</button>
+          </div>
+          <div class="choice">
+            <h4>紙の復旧コードから復元する</h4>
+            <p>PCの入れ替えや再インストールのあと。紙を見ながら55文字を入力します。</p>
+            <label for="restore-code">復旧コード</label>
+            <input id="restore-code" class="code" autocomplete="off" spellcheck="false" placeholder="XXXXX-XXXXX-…">
+            <button type="button" id="btn-restore">復元する</button>
+          </div>
+          <div class="choice">
+            <h4>新しい鍵を作る</h4>
+            <p>初めて使う場合。復旧コードを紙に書き写し、再入力で確かめてから保存します。</p>
+            <button type="button" id="btn-new">新しい鍵を作る</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="key-new" class="sheet" hidden>
+        <h3>復旧コードを紙に書き写してください</h3>
+        <p>このコードは、この画面でだけ表示します。スクリーンショットは撮らず、紙に正確に書き写してください。</p>
+        <p class="recovery" id="new-code"></p>
+        <p class="small">鍵の指紋：<span id="new-fp"></span>（鍵の識別用。鍵そのものは分かりません）</p>
+        <label for="new-retype">紙を見ながら、書き写したコードを入力してください</label>
+        <input id="new-retype" class="code" autocomplete="off" spellcheck="false">
+        <div class="row">
+          <button type="button" id="btn-new-save">一致を確かめて保存する</button>
+          <button type="button" class="quiet" id="btn-new-cancel">やめる</button>
+        </div>
+      </div>
+
+      <div id="key-check" hidden>
+        <h3>紙の復旧コードと照合する</h3>
+        <p>紙のコードで、いま保管している鍵を復元できるかを確かめます。何も変更しません。</p>
+        <label for="check-code">復旧コード</label>
+        <input id="check-code" class="code" autocomplete="off" spellcheck="false">
+        <div class="row"><button type="button" id="btn-check">照合する</button></div>
+      </div>
+    </section>
+
+    <!-- 2. DB -->
+    <section class="pane" id="p-db" hidden>
+      <h2>データベースを作る</h2>
+      <p class="lead">暗号鍵で暗号化した、空のデータベースを作ります。すでにある場合は作り直しません（上書きしません）。</p>
+      <dl class="facts" id="db-facts"></dl>
+      <div class="row" id="db-actions"><button type="button" id="btn-create">空のデータベースを作る</button></div>
+      <p class="small" id="db-hint"></p>
+    </section>
+
+    <!-- 3. 移行 -->
+    <section class="pane" id="p-migrate" hidden>
+      <h2>今のデータを移す</h2>
+      <p class="lead">今のシステム（HTML版）で書き出したバックアップ（JSON）を、データベースへ移す機能は、次の段階で追加します。</p>
+      <p>それまでは、今のシステムをこれまでどおり使ってください。データを移す前に、移行ツールで照合したのと同じ確認（件数・金額・操作履歴の連鎖）を、このアプリでも行う予定です。</p>
+    </section>
+
+    <!-- 4. バックアップ -->
+    <section class="pane" id="p-backup" hidden>
+      <h2>バックアップを取る</h2>
+      <p class="lead">データベースを、暗号化したままの完全なコピーとして保存します。作ったあと、同じ鍵で開けることを確かめます。</p>
+      <p>保存先には、USBメモリなど、このPCとは別の場所も使ってください。コピーを開くには、このPCの鍵か、紙の復旧コードが必要です。</p>
+      <div class="row"><button type="button" id="btn-backup">保存先を選んでバックアップする</button></div>
+      <p class="result" id="backup-result" hidden></p>
+    </section>
+  </main>
+</div>
+</body>
+</html>

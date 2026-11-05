@@ -1,0 +1,12 @@
+{
+  "name": "ibis-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "description": "統合業務システム デスクトップアプリ（Tauri）。画面はビルド不要の HTML/JS（ui フォルダ）",
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

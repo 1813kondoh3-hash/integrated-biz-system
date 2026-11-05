@@ -1,0 +1,48 @@
+# デスクトップアプリ（Tauri）を Windows でビルドする（手動実行）。
+# Actions タブ →「Desktop app build」→「ワークフローを実行する」。成果物 desktop-app に ibis-desktop.exe が入る。
+name: Desktop app build
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Perl と NASM を用意（OpenSSLのソースビルドに使う）
+        run: |
+          choco install nasm strawberryperl -y --no-progress
+          Add-Content -Path $env:GITHUB_PATH -Value "C:\Program Files\NASM"
+        continue-on-error: true
+
+      - uses: actions/setup-node@v7
+        with: { node-version: "22" }
+
+      - name: Tauri の道具を入れる
+        working-directory: desktop
+        run: npm ci
+
+      - name: アプリをビルド（インストーラは作らない）
+        working-directory: desktop
+        run: npx tauri build --no-bundle --features vendored-openssl 2>&1 | Tee-Object -FilePath ..\desktop-build.log
+
+      - name: SHA-256 を記録
+        run: |
+          $exe = "desktop/src-tauri/target/release/ibis-desktop.exe"
+          Get-Item $exe | Select-Object Name, Length | Format-List | Out-String | Tee-Object -FilePath sha256.txt
+          (Get-FileHash -Algorithm SHA256 $exe).Hash | Tee-Object -FilePath sha256.txt -Append
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: desktop-app
+          path: |
+            desktop/src-tauri/target/release/ibis-desktop.exe
+            sha256.txt
+            desktop-build.log

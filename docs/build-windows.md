@@ -122,6 +122,8 @@ powershell -ExecutionPolicy Bypass -File tools\collect-report.ps1
 | ビルドが極端に遅い・ファイルが消える | ウイルス対策ソフトが監視している可能性。リポジトリと `target` フォルダを除外に追加する（会社のポリシーに従う。要確認） |
 | テストが `UnicodeEncodeError: 'charmap' codec can't encode` で落ちる | Pythonの出力の文字コードが、日本語を表せない既定値になっている。`$env:PYTHONUTF8 = "1"` を設定してから実行する（`tools\build-core.ps1` は自動で設定する。GitHubのWindows環境で実際に起きた） |
 | 移行ツールで暗号化DBを扱うと「Windowsでは、このツールで暗号化DBを扱えません」と出る | 仕様です。Windows版のPython用暗号化ライブラリ（`sqlcipher3-wheels`）は、暗号化DBにスキーマを作る処理でクラッシュする（GitHubのWindows環境で確認。作業領域を128MBに広げても再現）。Windowsの暗号化DBは、動作を確認済みのRust側（アプリ）で扱う。暗号化なしの移行・確認、鍵の作成、復旧コードの控え・確認は、Windowsでもこのツールで使える |
+| PowerShellに貼り付けた `if` 〜 `elseif` が「用語 'elseif' は…認識されません」で止まる | 貼り付けると1行ずつ実行されるため、`}` で終わった行で `if` が完結してしまう。`} elseif (...) {` のように、閉じかっこと `elseif`・`else` を同じ行に書く（この手順書のコマンドは、その書き方にしている） |
+| Actions の「再実行」で、新しい変更が反映されない | 「再実行」（Re-run）は前回と同じコミットで動かす。新しいコミットで動かすときは、ワークフローの画面の「ワークフローを実行する」から実行する |
 | `pip install` で `sqlcipher3-wheels` が入らない | Windows用の配布が無い可能性。Pythonの暗号化テストは省略し、Rustのテストで確認する |
 
 ## 7. 代替手順：vcpkg の OpenSSL を使う（要検証）
@@ -157,4 +159,5 @@ vcpkg のトリプレット名・環境変数は、実機で確認が必要で�
 | GitHub Actions（CI） | **実行して緑を確認済み**（4ジョブ。アプリのテストは Node.js 22、Python の出力は `PYTHONUTF8=1`） |
 | `windows-build.yml`（手動実行） | **GitHubのWindows環境で確認済み**：DBテスト34件が合格、Rustのテスト4件が合格（`vendored-openssl`、ビルド約9分、4回連続）。Pythonの暗号化テストは8件が合格し、暗号化DBを使う12件は省略（次の行） |
 | Windows版 `sqlcipher3-wheels`（Python） | **暗号化DBにスキーマを作る処理でクラッシュ**する（作業領域を128MBに広げても再現）。そのため、Windowsでは移行ツールの暗号化を止め、暗号化DBはRust側（アプリ）で扱う |
-| Windows 10 実機 | **未検証**（Perl・NASMが必要かの確定、所要時間、SmartScreenの挙動、DPAPI） |
+| DPAPI（鍵の保護） | **GitHubのWindows環境と Windows 10 実機で確認済み**（[key-protection.md](key-protection.md)）。`windows-build.yml` の成果物に `ibis-key.exe` を追加した |
+| Windows 10 実機でのビルド | **未検証**（Perl・NASMが必要かの確定、所要時間、SmartScreenの挙動） |

@@ -1,0 +1,30 @@
+[package]
+name = "ibis-desktop"
+version = "0.1.0"
+edition = "2021"
+description = "統合業務システム デスクトップアプリ（Tauri 2）。鍵の準備・DBの作成・バックアップ（最小版）"
+publish = false
+
+[lib]
+name = "ibis_desktop_lib"
+crate-type = ["rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+ibis-core = { path = "../../rust/ibis-core" }
+
+[features]
+# Windows向け：OpenSSL（SQLCipher用）をソースからビルドして同梱する。GitHubのWindows環境では有効にする
+vendored-openssl = ["ibis-core/vendored-openssl"]
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

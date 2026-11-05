@@ -1,0 +1,110 @@
+/* 色：帳簿の紙とインクをもとにした配色。墨の青（本文）、深い青緑（操作）、朱（注意） */
+:root {
+  --paper: #fbfaf7;
+  --sheet: #ffffff;
+  --ink: #1d2a33;
+  --ink-soft: #5a6770;
+  --rule: #d9dcd6;
+  --teal: #245b6b;
+  --teal-deep: #183f4b;
+  --ok: #2f6b3a;
+  --warn: #b5432a;
+  --wash-ok: #e8f1e6;
+  --wash-warn: #f8e8e2;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #161c20; --sheet: #1e252a; --ink: #e6e9e6; --ink-soft: #a5b0b5; --rule: #34404a;
+    --teal: #7fb6c4; --teal-deep: #a9d2dc; --ok: #8cc79a; --warn: #f0a089;
+    --wash-ok: #1f3324; --wash-warn: #3a231d;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: "Yu Gothic UI", "Meiryo UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-size: 15px; line-height: 1.75;
+}
+.shell { display: grid; grid-template-columns: 250px 1fr; min-height: 100%; }
+.rail { background: var(--teal-deep); color: #fff; padding: 28px 18px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+@media (prefers-color-scheme: dark) { .rail { background: #0f2a32; } }
+.brand { font-size: 17px; font-weight: 700; margin: 0 0 28px; line-height: 1.4; }
+.brand span { display: block; font-size: 13px; font-weight: 400; opacity: .8; }
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; flex: 1; }
+.steps li { counter-increment: s; }
+.step {
+  width: 100%; text-align: left; background: none; border: 0; color: #fff; font: inherit;
+  padding: 10px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+}
+.step::before { content: counter(s); width: 1.4em; font-weight: 700; opacity: .7; }
+.step:hover { background: rgba(255,255,255,.08); }
+.step[aria-current="step"] { background: rgba(255,255,255,.16); }
+.step:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+/* 状態の印：済み＝塗りつぶし、未＝輪、注意＝朱、次の段階＝点線 */
+.mark { order: 2; margin-left: auto; width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(255,255,255,.7); flex: none; }
+.mark.done { background: #cfe8d3; border-color: #cfe8d3; }
+.mark.bad { background: #f3b4a3; border-color: #f3b4a3; }
+.mark.later { border-style: dotted; opacity: .6; }
+.ver { font-size: 12px; opacity: .7; margin: 0; }
+
+main { padding: 36px 44px; max-width: 860px; }
+h2 { font-size: 24px; margin: 0 0 6px; letter-spacing: .02em; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+h4 { font-size: 15px; margin: 0 0 4px; }
+.lead { color: var(--ink-soft); margin: 0 0 18px; max-width: 40em; }
+p { max-width: 40em; }
+.small { font-size: 13px; color: var(--ink-soft); }
+
+.facts { display: grid; grid-template-columns: 9em 1fr; gap: 6px 16px; margin: 0; padding: 16px 18px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; }
+.facts dt { color: var(--ink-soft); }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+.facts .good { color: var(--ok); font-weight: 700; }
+.facts .bad { color: var(--warn); font-weight: 700; }
+
+.choices { display: grid; gap: 14px; }
+.choice { background: var(--sheet); border: 1px solid var(--rule); border-left: 4px solid var(--teal); border-radius: 6px; padding: 14px 18px; }
+.choice p { margin: 0 0 10px; color: var(--ink-soft); font-size: 14px; }
+
+label { display: block; font-size: 13px; color: var(--ink-soft); margin: 10px 0 4px; }
+input.code {
+  width: 100%; font: 16px/1.4 "Consolas", "BIZ UDGothic", monospace; letter-spacing: .06em;
+  padding: 9px 11px; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink);
+}
+input.code:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+button:not(.step) {
+  font: inherit; font-weight: 700; padding: 8px 18px; border-radius: 6px; cursor: pointer;
+  background: var(--teal); color: #fff; border: 1px solid var(--teal);
+}
+@media (prefers-color-scheme: dark) { button:not(.step) { color: #10262d; } }
+button:not(.step):hover { background: var(--teal-deep); border-color: var(--teal-deep); }
+button:not(.step):focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+button.quiet { background: transparent; color: var(--teal); }
+button:disabled { opacity: .5; cursor: wait; }
+
+/* 復旧コード：紙の控えのように、大きく、区切って */
+.sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 22px 18px; margin-top: 18px; }
+.recovery {
+  font: 700 22px/1.7 "Consolas", "BIZ UDGothic", monospace; letter-spacing: .1em; word-spacing: .3em;
+  padding: 14px 16px; border: 2px dashed var(--teal); border-radius: 6px; max-width: none; user-select: all;
+}
+
+.notice { padding: 10px 14px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid var(--ok); background: var(--wash-ok); }
+.notice.error { border-left-color: var(--warn); background: var(--wash-warn); }
+.result { padding: 10px 14px; border-radius: 6px; background: var(--wash-ok); overflow-wrap: anywhere; }
+
+@media (max-width: 760px) {
+  .shell { grid-template-columns: 1fr; }
+  .rail { padding: 16px; position: static; height: auto; }
+  .steps { display: flex; flex-wrap: wrap; gap: 4px; }
+  main { padding: 24px 18px; }
+  .facts { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) { .notice { animation: show .2s ease-out; } }
+@keyframes show { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.choice input.code + button { margin-top: 10px; }
+.recovery .grp { display: inline-block; white-space: nowrap; }
